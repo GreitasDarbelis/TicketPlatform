@@ -1,4 +1,39 @@
+# Ticket Platform - Technical Report
+
+## 1. System Structure and Assigned Technologies
+A **3-tier multi-layer architectural style** was chosen to implement the project. The system is divided into the following layers:
+1. **Presentation Tier**: Designed as a Single Page Application (SPA) running in the browser workspace using **React.js** and Vite. It communicates with the server via REST APIs. The application is entirely stateless on the backend side, therefore satisfying sessionless state rules.
+2. **Business Logic Tier**: Runs on the server side using **Java** and **Spring Boot**. This tier contains `@Service` components that perform decision-making, process logic transactions, and run pricing algorithms. AOP Interceptors are configured exclusively in this layer for business logging.
+3. **Data Access Tier**: Implemented using **Spring Data JPA** (powered by Hibernate ORM) and a **PostgreSQL** relational database. This tier manages data abstraction by avoiding manual SQL queries (preventing SQL injections via internal Prepared Statements) and provides concurrent editing protection via JPA Optimistic Locking.
+
+## 2. Implementation of Qualitative Requirements in Source Code
+
+| Requirement | Technological Solution | Project Example (Class & Explanation) |
+| :--- | :--- | :--- |
+| **Concurrency** | State is not saved in any backend session. HTTP requests are completely "stateless". | `frontend/` React application – user works asynchronously without session locks over the REST boundaries. |
+| **Security (SQL inject)** | Secure queries via JPA "Prepared Statements" are utilized automatically in data operations. | `backend/src/main/java/com/ticketplatform/backend/repository/EventRepository.java` (inherits JpaRepository for automatic query shielding). |
+| **Data Access** | Short transactions bound to single HTTP request scopes are managed via ORM. No logic is stalled pending UI entry. | `backend/src/main/java/com/ticketplatform/backend/service/EventService.java` utilizes the `@Transactional` method boundaries. |
+| **Data consistency (Locking)** | JPA `@Version` annotation enforces conflict rejection (throwing `ObjectOptimisticLockingFailureException`). | `backend/src/main/java/com/ticketplatform/backend/model/Event.java` relies on an integer `@Version` field tracking conflicts. |
+| **Memory management** | `Singleton scope` is strictly upheld for business logic, reducing the RAM footprint by avoiding session scoping. | `backend/src/main/java/com/ticketplatform/backend/service/EventService.java` naturally binds to Spring's default singleton context. |
+| **Interceptors** | Spring AOP (`@Aspect`, `@Before`) logs all Service method invocations remotely without invasively editing primary classes. | `backend/src/main/java/com/ticketplatform/backend/aspect/LoggingAspect.java` executes execution intercepts across the `com.ticketplatform.backend.service.*` package. |
+| **Extensibility** | “Strategy” design pattern implemented for calculating ticket prices based on flexible roles or periods. | Interface: `backend/src/main/java/com/ticketplatform/backend/service/strategy/TicketPriceStrategy.java` and implementation `StandardTicketPriceStrategy.java` |
+
+---
+
+### How to run the project locally?
+
+**Starting the Frontend:**
 ```bash
 cd frontend
-npm run build
+npm install
+npm run dev
 ```
+
+**Starting the Backend (& Database setup):**
+Ensure that a local instance of PostgreSQL is running with an empty database named `ticketplatform` (`username: postgres, password: root`).
+```bash
+cd backend
+./mvnw spring-boot:run
+# or simply "mvn spring-boot:run"
+```
+The database entity structure/tables will be generated automatically upon the first application start via Hibernate (`ddl-auto=update`).
