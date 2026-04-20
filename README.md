@@ -37,3 +37,37 @@ cd backend
 # or simply "mvn spring-boot:run"
 ```
 The database entity structure/tables will be generated automatically upon the first application start via Hibernate (`ddl-auto=update`).
+
+Core frontend scaffold:
+
+- `src/app/page-registry.ts` is the single route catalog for pages and subpages.
+- `src/app/AppShell.tsx` provides the shared app bar, role switcher, and page navigation.
+- `src/components/AppBreadcrumbs.tsx` renders breadcrumbs automatically from the route catalog.
+- `src/components/PageTemplate.tsx` is the shared page layout wrapper.
+- `src/components/PagePlaceholder.tsx` is the default stub to replace with real page content.
+- `src/features/session/RoleSessionContext.tsx` holds the temporary active role used before real auth exists.
+
+How to add a new page:
+
+1. Create the page component.
+2. Register its route metadata in `src/app/page-registry.ts`.
+3. Attach the component to that route entry when it is ready.
+
+Once a page is registered, the navigation shell and breadcrumbs can use it consistently.
+
+Example:
+
+```ts
+{
+  id: 'customer-events',
+  role: 'customer',
+  path: '/customer/events',
+  title: 'Event Catalog',
+  navLabel: 'Events',
+  description: '...',
+  summary: '...',
+  outcomes: ['...'],
+  icon: EventRoundedIcon,
+  component: CustomerEventsPage,
+}
+```

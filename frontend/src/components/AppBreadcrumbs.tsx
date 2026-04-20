@@ -22,7 +22,7 @@ export function AppBreadcrumbs() {
 
         if (isLastPage) {
           return (
-            <Typography key={page.path} color="text.primary" sx={{ fontWeight: 600 }}>
+            <Typography key={page.path} color="text.primary" sx={{ fontWeight: 500 }}>
               {page.title}
             </Typography>
           );

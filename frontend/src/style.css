@@ -1,5 +1,15 @@
 :root {
   color-scheme: light;
+  --color-ink-black: #061e23;
+  --color-stormy-teal: #336970;
+  --color-dark-cyan: #24948e;
+  --color-light-cyan: #daf9fb;
+  --color-pumpkin-spice: #f27618;
+  --color-text-black: #000000;
+  --color-text-white: #ffffff;
+  --color-text-success: #35b109;
+  --color-text-error: #cf0000;
+  --color-text-warning: #ffc800;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -15,6 +25,9 @@ body,
 body {
   margin: 0;
   min-width: 320px;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  background-color: var(--color-light-cyan);
+  color: var(--color-text-black);
 }
 
 a {
