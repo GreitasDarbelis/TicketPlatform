@@ -1,43 +1,79 @@
 import { createTheme } from '@mui/material/styles';
 
+const figmaPalette = {
+  inkBlack: '#061E23',
+  stormyTeal: '#336970',
+  darkCyan: '#24948E',
+  lightCyan: '#DAF9FB',
+  pumpkinSpice: '#F27618',
+  black: '#000000',
+  white: '#FFFFFF',
+  brightFern: '#35B109',
+  brickEmber: '#CF0000',
+  schoolBusYellow: '#FFC800',
+} as const;
+
 export const appTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#155eef',
-      dark: '#0040c1',
-      light: '#5b8cff',
+      main: figmaPalette.darkCyan,
+      dark: figmaPalette.stormyTeal,
+      light: figmaPalette.lightCyan,
+      contrastText: figmaPalette.white,
     },
     secondary: {
-      main: '#0f766e',
+      main: figmaPalette.pumpkinSpice,
+      contrastText: figmaPalette.white,
+    },
+    success: {
+      main: figmaPalette.brightFern,
+      contrastText: figmaPalette.white,
+    },
+    error: {
+      main: figmaPalette.brickEmber,
+      contrastText: figmaPalette.white,
+    },
+    warning: {
+      main: figmaPalette.schoolBusYellow,
+      contrastText: figmaPalette.black,
     },
     background: {
-      default: '#f4f7fb',
-      paper: '#ffffff',
+      default: figmaPalette.lightCyan,
+      paper: figmaPalette.white,
     },
     text: {
-      primary: '#122033',
-      secondary: '#516076',
+      primary: figmaPalette.black,
+      secondary: figmaPalette.inkBlack,
+      disabled: figmaPalette.stormyTeal,
     },
+    divider: figmaPalette.lightCyan,
   },
   shape: {
     borderRadius: 18,
   },
   typography: {
-    fontFamily: '"IBM Plex Sans", "Segoe UI", sans-serif',
+    fontFamily: '"Poppins", "Segoe UI", sans-serif',
+    fontWeightLight: 400,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 500,
     h3: {
-      fontWeight: 700,
+      fontWeight: 500,
       letterSpacing: '-0.03em',
     },
     h4: {
-      fontWeight: 700,
+      fontWeight: 500,
       letterSpacing: '-0.02em',
     },
     h5: {
-      fontWeight: 700,
+      fontWeight: 500,
+    },
+    h6: {
+      fontWeight: 500,
     },
     button: {
-      fontWeight: 600,
+      fontWeight: 500,
       textTransform: 'none',
     },
   },
@@ -45,7 +81,8 @@ export const appTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          background: '#f4f7fb',
+          background: figmaPalette.lightCyan,
+          color: figmaPalette.black,
         },
       },
     },
@@ -53,8 +90,14 @@ export const appTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: 'rgba(255, 255, 255, 0.92)',
-          borderBottom: '1px solid rgba(18, 32, 51, 0.08)',
+          backgroundColor: figmaPalette.inkBlack,
+          color: figmaPalette.white,
+          boxShadow: 'none',
+        },
+        colorPrimary: {
+          backgroundImage: 'none',
+          backgroundColor: figmaPalette.inkBlack,
+          color: figmaPalette.white,
         },
       },
     },
@@ -62,6 +105,8 @@ export const appTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
+          backgroundColor: figmaPalette.white,
+          color: figmaPalette.black,
           borderRadius: 24,
         },
       },
@@ -70,14 +115,15 @@ export const appTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
+          backgroundColor: figmaPalette.white,
+          color: figmaPalette.black,
         },
       },
     },
-    MuiTab: {
+    MuiLink: {
       styleOverrides: {
         root: {
-          minHeight: 56,
-          paddingInline: 18,
+          color: 'inherit',
         },
       },
     },

@@ -2,13 +2,12 @@ import { startTransition } from 'react';
 import {
   AppBar,
   Box,
+  Button,
   Container,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
-  Tab,
-  Tabs,
+  Stack,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -34,19 +33,93 @@ function AppShell() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
-      <AppBar position="sticky" color="transparent" elevation={0}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
+      <AppBar position="sticky" color="primary" elevation={0}>
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ gap: 2, py: 1.5, flexWrap: 'wrap' }}>
-            <Typography variant="h6">TicketPlatform</Typography>
+          <Toolbar
+            disableGutters
+            sx={{
+              minHeight: 88,
+              py: 1.5,
+              gap: 3,
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{ color: 'common.white', fontWeight: 500, letterSpacing: '-0.02em' }}
+            >
+              TicketPlatform
+            </Typography>
 
-            <Box sx={{ flexGrow: 1 }} />
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
+                marginLeft: 'auto',
+              }}
+            >
+              {navPages.map((page) => {
+                const isActive = page.path === activeNavPage?.path;
 
-            <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 220 } }}>
-              <InputLabel id="role-select-label">Role</InputLabel>
+                return (
+                  <Button
+                    key={page.path}
+                    component={RouterLink}
+                    to={page.path}
+                    disableElevation
+                    sx={{
+                      px: 2.25,
+                      py: 1,
+                      minWidth: 'auto',
+                      borderRadius: '12px',
+                      color: 'common.white',
+                      backgroundColor: isActive ? 'primary.main' : 'transparent',
+                      '&:hover': {
+                        backgroundColor: isActive ? 'primary.main' : 'primary.dark',
+                      },
+                    }}
+                  >
+                    {page.navLabel}
+                  </Button>
+                );
+              })}
+
+              <FormControl
+                size="small"
+                sx={{
+                  minWidth: 164,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '999px',
+                    backgroundColor: 'secondary.main',
+                    color: 'common.white',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '& .MuiSelect-icon': {
+                    color: 'common.white',
+                  },
+                  '& .MuiSelect-select': {
+                    py: 1,
+                    pr: 4.5,
+                    pl: 2,
+                    color: 'common.white',
+                  },
+                }}
+              >
               <Select
-                labelId="role-select-label"
-                label="Role"
                 value={role}
                 onChange={(event) => handleRoleChange(event.target.value as UserRole)}
               >
@@ -56,28 +129,9 @@ function AppShell() {
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl>
+              </FormControl>
+            </Stack>
           </Toolbar>
-        </Container>
-
-        <Container maxWidth="xl">
-          <Tabs
-            value={activeNavPage?.path ?? false}
-            variant="scrollable"
-            scrollButtons="auto"
-            allowScrollButtonsMobile
-            sx={{ minHeight: 56 }}
-          >
-            {navPages.map((page) => (
-              <Tab
-                key={page.path}
-                value={page.path}
-                component={RouterLink}
-                to={page.path}
-                label={page.navLabel}
-              />
-            ))}
-          </Tabs>
         </Container>
       </AppBar>
 

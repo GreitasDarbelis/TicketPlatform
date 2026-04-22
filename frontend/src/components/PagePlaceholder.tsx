@@ -13,11 +13,10 @@ export function PagePlaceholder({ page }: PagePlaceholderProps) {
   return (
     <PageTemplate page={page}>
       <Paper
-        variant="outlined"
         sx={{
           p: 3,
-          borderRadius: 4,
-          borderColor: 'rgba(18, 32, 51, 0.08)',
+          borderRadius: '24px',
+          backgroundColor: 'background.paper',
         }}
       >
         <Typography color="text.secondary">Page not implemented yet.</Typography>
