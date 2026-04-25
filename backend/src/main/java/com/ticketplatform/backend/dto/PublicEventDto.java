@@ -9,6 +9,7 @@ public record PublicEventDto(
         String description,
         LocalDateTime date,
         String location,
+        String imageData,
         Integer totalTickets,
         String organizerEmail
 ) {

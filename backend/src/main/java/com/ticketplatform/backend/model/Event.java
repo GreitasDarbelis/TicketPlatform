@@ -26,6 +26,9 @@ public class Event {
     @Column(nullable = false)
     private String location;
 
+    @Column(columnDefinition = "TEXT")
+    private String imageData;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;

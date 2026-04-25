@@ -59,6 +59,7 @@ public class EventService {
                 event.getDescription(),
                 event.getDate(),
                 event.getLocation(),
+                event.getImageData(),
                 event.getTotalTickets(),
                 event.getOrganizer().getEmail()
         );

@@ -16,10 +16,6 @@ import { PageTemplate } from '../../components/PageTemplate';
 import { fetchEvents } from './api';
 import type { EventSummary } from './types';
 
-const eventCardImages = [ // random placeholder images for event cards
-  'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=80',
-] as const;
 
 function formatEventDate(value: string): string { // formats into "20 Mar 2024, 7:30 PM"
   return new Intl.DateTimeFormat('en-GB', {
@@ -28,8 +24,8 @@ function formatEventDate(value: string): string { // formats into "20 Mar 2024, 
   }).format(new Date(value));
 }
 
-function getEventImage(index: number): string {
-  return eventCardImages[index % eventCardImages.length]; // pick image to event
+function getEventImage(imageData: string | null): string {
+  return imageData ?? ''; // use stored image
 }
 
 const customerEventsPage: AppPage = {
@@ -98,7 +94,7 @@ export function EventListPage() {
 
         {!isLoading && !errorMessage ? (
           <Grid container spacing={3}>
-            {events.map((event, index) => (
+            {events.map((event) => (
               <Grid key={event.id} size={{ xs: 12, md: 6, xl: 4 }}>
                 <Card
                   elevation={0}
@@ -122,7 +118,7 @@ export function EventListPage() {
                     className="event-card-image"
                     sx={{
                       height: 192,
-                      backgroundImage: `url(${getEventImage(index)})`,
+                      backgroundImage: `url(${getEventImage(event.imageData)})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
