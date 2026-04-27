@@ -22,6 +22,19 @@ A **3-tier multi-layer architectural style** was chosen to implement the project
 
 ### How to run the project locally?
 
+**Using Docker**
+
+The only command needed to start the entire stack:
+
+```bash
+docker-compose up --build
+```
+- **Frontend** will be available at: `http://localhost:5173` (with hot-reloading enabled)
+- **Backend API** will be available at: `http://localhost:8080`
+- **Database** will be exposed on port `5433` (to avoid conflicts with local installations)
+
+**Manual Setup (Manual docker-compose setup) (only if Docker does not work):**
+
 **Starting the Frontend:**
 ```bash
 cd frontend
@@ -30,7 +43,7 @@ npm run dev
 ```
 
 **Starting the Backend (& Database setup):**
-Ensure that a local instance of PostgreSQL is running with an empty database named `ticketplatform` (`username: postgres, password: root`).
+Ensure that a local instance of PostgreSQL is running with an empty database named `ticketplatform` (`username: postgres, password: root`) on port 5432.
 ```bash
 cd backend
 ./mvnw spring-boot:run
