@@ -1,10 +1,13 @@
 package com.ticketplatform.backend.controller;
 
+import com.ticketplatform.backend.dto.PublicEventDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.service.EventService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/events")
@@ -18,6 +21,16 @@ public class EventController {
 
     // REQUIREMENT: 3-tier presentation layer
     // React will call these REST API endpoints. A transaction is started during the HTTP request.
+
+    @GetMapping
+    public ResponseEntity<List<PublicEventDto>> getEvents() {
+        return ResponseEntity.ok(eventService.getPublicEvents());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PublicEventDto> getEvent(@PathVariable UUID id) {
+        return ResponseEntity.ok(eventService.getPublicEvent(id));
+    }
 
     @PostMapping
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
