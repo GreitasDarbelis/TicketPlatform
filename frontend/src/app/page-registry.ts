@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { EventListPage } from '../features/events/EventListPage';
+import CreateEventPage from '../features/events/CreateEventPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -56,6 +57,7 @@ export const appPages: AppPage[] = [
     title: 'Create Event',
     navLabel: 'Create Event',
     showInNav: false,
+    component: CreateEventPage,
   },
   {
     id: 'organizer-events-edit',
