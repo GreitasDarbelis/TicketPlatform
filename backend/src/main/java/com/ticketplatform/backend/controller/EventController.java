@@ -40,9 +40,11 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(@PathVariable String id, @RequestBody Event event) {
-        // Throws ObjectOptimisticLockingFailureException in case
-        // versions no longer match, and GlobalExceptionHandler would return HTTP 409 (Conflict).
-        return ResponseEntity.ok(eventService.updateEvent(event));
+    public ResponseEntity<PublicEventDto> updateEvent(@PathVariable UUID id, @RequestBody CreateEventRequest request) {
+        // Update existing event by id using a CreateEventRequest-shaped payload.
+        // Throws ObjectOptimisticLockingFailureException in case versions no longer match,
+        // and GlobalExceptionHandler would return HTTP 409 (Conflict).
+        PublicEventDto updated = eventService.updateEvent(id, request);
+        return ResponseEntity.ok(updated);
     }
 }

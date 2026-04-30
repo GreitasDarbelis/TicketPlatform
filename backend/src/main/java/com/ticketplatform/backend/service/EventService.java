@@ -16,6 +16,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
 // REQUIREMENT: Data Access / Transactions
 // The transaction spans only the execution time of this method, and starts/ends
@@ -58,6 +59,26 @@ public class EventService {
         // When updating an event, JPA Optimistic Locking will automatically
         // check the @Version field defined in the 'Event' class.
         return eventRepository.save(event);
+    }
+
+    @Transactional
+    public PublicEventDto updateEvent(UUID id, CreateEventRequest request) {
+        // Validate input similar to create
+        validateCreateRequest(request);
+
+        Event existing = eventRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found."));
+
+        existing.setTitle(request.title().trim());
+        existing.setDescription(blankToNull(request.description()));
+        existing.setDate(parseDateTime(request.date(), request.time()));
+        existing.setLocation(request.location().trim());
+        existing.setImageData(blankToNull(request.imageUrl()));
+        existing.setTotalTickets(request.totalTickets());
+        existing.setOrganizer(resolveOrganizer(request.organizerEmail()));
+
+        Event saved = eventRepository.save(existing);
+        return toPublicEventDto(saved);
     }
 
     @Transactional(readOnly = true)
