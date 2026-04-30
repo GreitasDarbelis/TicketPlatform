@@ -44,7 +44,7 @@ export const appTheme = createTheme({
     },
     text: {
       primary: figmaPalette.black,
-      secondary: figmaPalette.inkBlack,
+      secondary: figmaPalette.white,
       disabled: figmaPalette.stormyTeal,
     },
     divider: figmaPalette.lightCyan,

@@ -1,6 +1,5 @@
 import type {UserRole} from "../../app/roles";
 
-
 export type AuthUser = {
     id: string;
     email: string;
