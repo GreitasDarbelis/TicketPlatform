@@ -1,5 +1,6 @@
 package com.ticketplatform.backend.controller;
 
+import com.ticketplatform.backend.dto.CreateEventRequest;
 import com.ticketplatform.backend.dto.PublicEventDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.service.EventService;
@@ -33,8 +34,8 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        Event created = eventService.createEvent(event);
+    public ResponseEntity<PublicEventDto> createEvent(@RequestBody CreateEventRequest request) {
+        PublicEventDto created = eventService.createEvent(request);
         return ResponseEntity.ok(created);
     }
 

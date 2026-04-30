@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  Alert,
   Box,
   Stack,
   TextField,
@@ -11,6 +12,7 @@ import {
 import Grid from '@mui/material/Grid';
 import { PageTemplate } from '../../components/PageTemplate';
 import type { AppPage } from '../../app/page-registry';
+import { createEvent } from './api';
 
 const createEventPage: AppPage = {
   id: 'organizer-events-new',
@@ -29,28 +31,44 @@ export default function CreateEventPage() {
   const [price, setPrice] = useState<number | ''>('');
   const [tickets, setTickets] = useState<number | ''>('');
   const [imageUrl, setImageUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitError(null);
+    setSubmitSuccess(null);
 
-    const payload = {
-      title,
-      date: date || null,
-      time: time || null,
-      location,
-      description: description || null,
-      ticketPrice: price === '' ? null : price,
-      totalTickets: tickets === '' ? null : tickets,
-      imageUrl: imageUrl || null,
-    };
+    try {
+      setIsSubmitting(true);
 
-    // For now we just log the payload. The user said they will wire up backend later.
-    // Replace this with an API call when ready.
-    // eslint-disable-next-line no-console
-    console.log('Create event (not yet implemented):', payload);
-    // quick visual feedback
-    // eslint-disable-next-line no-alert
-    alert('Create event is not yet implemented. Payload logged to console.');
+      await createEvent({
+        title: title.trim(),
+        date,
+        time,
+        location: location.trim(),
+        description: description.trim() || null,
+        totalTickets: tickets === '' ? null : tickets,
+        imageUrl: imageUrl.trim() || null,
+        organizerEmail: null,
+      });
+
+      setSubmitSuccess('Event created successfully.');
+      setTitle('');
+      setDate('');
+      setTime('12:00');
+      setLocation('');
+      setDescription('');
+      setPrice('');
+      setTickets('');
+      setImageUrl('');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create event.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -59,10 +77,23 @@ export default function CreateEventPage() {
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={3}>
+              {submitError ? (
+                <Grid size={{ xs: 12 }}>
+                  <Alert severity="error">{submitError}</Alert>
+                </Grid>
+              ) : null}
+
+              {submitSuccess ? (
+                <Grid size={{ xs: 12 }}>
+                  <Alert severity="success">{submitSuccess}</Alert>
+                </Grid>
+              ) : null}
+
               <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Event Title"
                   fullWidth
+                  required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
@@ -73,6 +104,8 @@ export default function CreateEventPage() {
                   label="Date"
                   type="date"
                   fullWidth
+                  required
+                  slotProps={{ inputLabel: { shrink: true } }}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                 />
@@ -83,6 +116,8 @@ export default function CreateEventPage() {
                   label="Time"
                   type="time"
                   fullWidth
+                  required
+                  slotProps={{ inputLabel: { shrink: true } }}
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                 />
@@ -92,6 +127,7 @@ export default function CreateEventPage() {
                 <TextField
                   label="Location"
                   fullWidth
+                  required
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
@@ -152,9 +188,10 @@ export default function CreateEventPage() {
                     type="submit"
                     variant="contained"
                     color="primary"
+                    disabled={isSubmitting}
                     sx={{ flex: 1, py: 1.75, borderRadius: '8px' }}
                   >
-                    Create Event
+                    {isSubmitting ? 'Creating...' : 'Create Event'}
                   </Button>
                 </Stack>
               </Grid>
