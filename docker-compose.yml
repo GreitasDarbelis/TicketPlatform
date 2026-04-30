@@ -43,6 +43,7 @@ services:
     environment:
       # Use polling for hot-reloading in some environments (like Windows on WSL/Docker Desktop)
       - CHOKIDAR_USEPOLLING=true
+      - VITE_API_PROXY_TARGET=http://backend:8080
     depends_on:
       - backend
     restart: unless-stopped

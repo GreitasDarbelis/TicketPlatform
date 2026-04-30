@@ -1,5 +1,8 @@
 import type { ComponentType } from 'react';
 import { EventListPage } from '../features/events/EventListPage';
+import CreateEventPage from '../features/events/CreateEventPage';
+import EditEventPage from '../features/events/EditEventPage';
+import { OrganizerEventsPage } from '../features/events/OrganizerEventsPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -48,6 +51,7 @@ export const appPages: AppPage[] = [
     path: '/organizer/events',
     title: 'Events',
     navLabel: 'Events',
+    component: OrganizerEventsPage,
   },
   {
     id: 'organizer-events-new',
@@ -56,14 +60,16 @@ export const appPages: AppPage[] = [
     title: 'Create Event',
     navLabel: 'Create Event',
     showInNav: false,
+    component: CreateEventPage,
   },
   {
     id: 'organizer-events-edit',
     role: 'organizer',
-    path: '/organizer/events/edit',
+    path: '/organizer/events/edit/:id',
     title: 'Edit Event',
     navLabel: 'Edit Event',
     showInNav: false,
+    component: EditEventPage,
   },
   {
     id: 'staff-overview',
