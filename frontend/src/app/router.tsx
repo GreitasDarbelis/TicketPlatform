@@ -8,19 +8,27 @@ import {
 } from './page-registry';
 import { roleHomePaths, roles, type UserRole } from './roles';
 import { PagePlaceholder } from '../components/PagePlaceholder';
-import { RoleGuard } from '../features/session/RoleGuard';
-import { useRoleSession } from '../features/session/RoleSessionContext';
+import { useAuthSession } from '../features/session/AuthSessionContext';
+import { AuthGuard } from '../features/session/AuthGuard';
+import AuthPage from '../features/session/AuthPage';
+import { Box, CircularProgress } from '@mui/material';
 
-function RootRedirect() {
-  const { role } = useRoleSession();
+function AuthRedirect() {
+  const { status, user } = useAuthSession();
 
-  return <Navigate to={roleHomePaths[role]} replace />;
-}
+  if (status === 'loading') {
+    return (
+        <Box sx={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+          <CircularProgress />
+        </Box>
+    );
+  }
 
-function CatchAllRedirect() {
-  const { role } = useRoleSession();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
-  return <Navigate to={roleHomePaths[role]} replace />;
+  return <Navigate to={roleHomePaths[user.role]} replace />;
 }
 
 function buildRolePageRoute(page: AppPage, role: UserRole): RouteObject {
@@ -29,31 +37,22 @@ function buildRolePageRoute(page: AppPage, role: UserRole): RouteObject {
   const element = PageComponent ? <PageComponent /> : <PagePlaceholder page={page} />;
 
   if (relativePath === '') {
-    return {
-      index: true,
-      element,
-    };
+    return { index: true, element };
   }
 
-  return {
-    path: relativePath,
-    element,
-  };
+  return { path: relativePath, element };
 }
 
 function buildRoleRoutes(role: UserRole): RouteObject {
   return {
     path: role,
-    element: <RoleGuard expectedRole={role} />,
+    element: <AuthGuard />, // require auth for any /<role> area
     children: [
       {
-        element: <AppShell />,
+        element: <AppShell />, // shell for authenticated UI
         children: [
           ...getPagesForRole(role).map((page) => buildRolePageRoute(page, role)),
-          {
-            path: '*',
-            element: <CatchAllRedirect />,
-          },
+          { path: '*', element: <AuthRedirect /> },
         ],
       },
     ],
@@ -61,13 +60,9 @@ function buildRoleRoutes(role: UserRole): RouteObject {
 }
 
 export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <RootRedirect />,
-  },
-  ...roles.map((role) => buildRoleRoutes(role)),
-  {
-    path: '*',
-    element: <CatchAllRedirect />,
-  },
+  { path: '/', element: <AuthRedirect /> },
+  { path: '/login', element: <AuthPage /> },
+  { path: '/signup', element: <AuthPage /> },
+  ...roles.map((r) => buildRoleRoutes(r)),
+  { path: '*', element: <AuthRedirect /> },
 ]);

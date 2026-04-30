@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import App from './App';
 import { appTheme } from './app/theme';
-import { RoleSessionProvider } from './features/session/RoleSessionContext';
 import './style.css';
+import {AuthSessionProvider} from "./features/session/AuthSessionContext";
 
 const appRoot = document.querySelector<HTMLDivElement>('#app');
 
@@ -16,9 +16,9 @@ createRoot(appRoot).render(
   <StrictMode>
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
-      <RoleSessionProvider>
+      <AuthSessionProvider>
         <App />
-      </RoleSessionProvider>
+      </AuthSessionProvider>
     </ThemeProvider>
   </StrictMode>,
 );
