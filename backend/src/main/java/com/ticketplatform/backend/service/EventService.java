@@ -55,13 +55,6 @@ public class EventService {
     }
 
     @Transactional
-    public Event updateEvent(Event event) {
-        // When updating an event, JPA Optimistic Locking will automatically
-        // check the @Version field defined in the 'Event' class.
-        return eventRepository.save(event);
-    }
-
-    @Transactional
     public PublicEventDto updateEvent(UUID id, CreateEventRequest request) {
         // Validate input similar to create
         validateCreateRequest(request);
