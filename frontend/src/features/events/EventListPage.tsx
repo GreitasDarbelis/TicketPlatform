@@ -15,25 +15,15 @@ import { useNavigate } from 'react-router-dom';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
 import { fetchEvents } from './api';
+import { formatEventDate, getEventImage } from './display';
 import type { EventSummary } from './types';
-
-function formatEventDate(value: string): string { // formats into "20 Mar 2024, 7:30 PM"
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
-}
-
-function getEventImage(imageData: string | null): string {
-  return imageData ?? ''; // use stored image
-}
 
 const customerEventsPage: AppPage = {
   id: 'customer-events',
   role: 'customer',
   path: '/customer/events',
   title: 'Browse Events',
-  navLabel: 'Events',
+  navLabel: 'Browse Events',
 };
 
 export function EventListPage() {
@@ -141,7 +131,7 @@ export function EventListPage() {
                       <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
                         <CalendarMonthOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
                         <Typography variant="body1" color="text.secondary">
-                          {formatEventDate(event.date)}
+                          {formatEventDate(event.date, 'medium')}
                         </Typography>
                       </Stack>
 
