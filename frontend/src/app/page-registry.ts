@@ -1,6 +1,19 @@
-import type { ComponentType } from 'react';
+import { createElement, type ComponentType } from 'react';
+import { Navigate } from 'react-router-dom';
 import { EventListPage } from '../features/events/EventListPage';
+import { EventDetailsPage } from '../features/events/EventDetailsPage';
+import CreateEventPage from '../features/events/CreateEventPage';
+import EditEventPage from '../features/events/EditEventPage';
+import { OrganizerEventsPage } from '../features/events/OrganizerEventsPage';
+import { MockPaymentPage } from '../features/tickets/MockPaymentPage';
+import { MyEventsPage } from '../features/tickets/MyEventsPage';
+import { PurchaseTicketsPage } from '../features/tickets/PurchaseTicketsPage';
+import { TicketDetailsPage } from '../features/tickets/TicketDetailsPage';
 import { roleHomePaths, type UserRole } from './roles';
+
+function CustomerOverviewRedirect() {
+  return createElement(Navigate, { to: '/customer/events', replace: true });
+}
 
 export type AppPage = {
   id: string;
@@ -19,21 +32,60 @@ export const appPages: AppPage[] = [
     path: '/customer',
     title: 'Customer',
     navLabel: 'Home',
+    showInNav: false,
+    component: CustomerOverviewRedirect,
   },
   {
     id: 'customer-events',
     role: 'customer',
     path: '/customer/events',
-    title: 'Events',
-    navLabel: 'Events',
+    title: 'Browse Events',
+    navLabel: 'Browse Events',
     component: EventListPage,
+  },
+  {
+    id: 'customer-event-details',
+    role: 'customer',
+    path: '/customer/events/:eventId',
+    title: 'Event Details',
+    navLabel: 'Event Details',
+    showInNav: false,
+    component: EventDetailsPage,
+  },
+  {
+    id: 'customer-event-purchase',
+    role: 'customer',
+    path: '/customer/events/:eventId/purchase',
+    title: 'Purchase Tickets',
+    navLabel: 'Purchase Tickets',
+    showInNav: false,
+    component: PurchaseTicketsPage,
+  },
+  {
+    id: 'customer-event-payment',
+    role: 'customer',
+    path: '/customer/events/:eventId/payment',
+    title: 'Payment',
+    navLabel: 'Payment',
+    showInNav: false,
+    component: MockPaymentPage,
   },
   {
     id: 'customer-tickets',
     role: 'customer',
     path: '/customer/tickets',
-    title: 'My Tickets',
-    navLabel: 'My Tickets',
+    title: 'My Events',
+    navLabel: 'My Events',
+    component: MyEventsPage,
+  },
+  {
+    id: 'customer-ticket-details',
+    role: 'customer',
+    path: '/customer/tickets/:ticketId',
+    title: 'Ticket',
+    navLabel: 'Ticket',
+    showInNav: false,
+    component: TicketDetailsPage,
   },
   {
     id: 'organizer-overview',
@@ -48,6 +100,7 @@ export const appPages: AppPage[] = [
     path: '/organizer/events',
     title: 'Events',
     navLabel: 'Events',
+    component: OrganizerEventsPage,
   },
   {
     id: 'organizer-events-new',
@@ -56,14 +109,16 @@ export const appPages: AppPage[] = [
     title: 'Create Event',
     navLabel: 'Create Event',
     showInNav: false,
+    component: CreateEventPage,
   },
   {
     id: 'organizer-events-edit',
     role: 'organizer',
-    path: '/organizer/events/edit',
+    path: '/organizer/events/edit/:id',
     title: 'Edit Event',
     navLabel: 'Edit Event',
     showInNav: false,
+    component: EditEventPage,
   },
   {
     id: 'staff-overview',

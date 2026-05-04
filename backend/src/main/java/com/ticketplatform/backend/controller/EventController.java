@@ -1,5 +1,6 @@
 package com.ticketplatform.backend.controller;
 
+import com.ticketplatform.backend.dto.CreateEventRequest;
 import com.ticketplatform.backend.dto.PublicEventDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.service.EventService;
@@ -33,15 +34,17 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        Event created = eventService.createEvent(event);
+    public ResponseEntity<PublicEventDto> createEvent(@RequestBody CreateEventRequest request) {
+        PublicEventDto created = eventService.createEvent(request);
         return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(@PathVariable String id, @RequestBody Event event) {
-        // Throws ObjectOptimisticLockingFailureException in case
-        // versions no longer match, and GlobalExceptionHandler would return HTTP 409 (Conflict).
-        return ResponseEntity.ok(eventService.updateEvent(event));
+    public ResponseEntity<PublicEventDto> updateEvent(@PathVariable UUID id, @RequestBody CreateEventRequest request) {
+        // Update existing event by id using a CreateEventRequest-shaped payload.
+        // Throws ObjectOptimisticLockingFailureException in case versions no longer match,
+        // and GlobalExceptionHandler would return HTTP 409 (Conflict).
+        PublicEventDto updated = eventService.updateEvent(id, request);
+        return ResponseEntity.ok(updated);
     }
 }
