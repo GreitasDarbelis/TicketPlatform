@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { EventListPage } from '../features/events/EventListPage';
+import { EventDetailsPage } from '../features/events/EventDetailsPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -27,6 +28,15 @@ export const appPages: AppPage[] = [
     title: 'Events',
     navLabel: 'Events',
     component: EventListPage,
+  },
+  {
+    id: 'customer-event-details',
+    role: 'customer',
+    path: '/customer/events/:eventId',
+    title: 'Event Details',
+    navLabel: 'Event Details',
+    showInNav: false,
+    component: EventDetailsPage,
   },
   {
     id: 'customer-tickets',
