@@ -61,7 +61,7 @@ export default function AuthPage() {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'Customer',
+        role: 'customer',
         confirmationCode: '',
     });
 
@@ -190,8 +190,6 @@ export default function AuthPage() {
                     />
                 </Tabs>
 
-                {authError && <Alert severity="error" sx={{ mb: 2 }}>{authError}</Alert>}
-
                 {/* Login Tab */}
                 <TabPanel value={tabValue} index={0}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -315,6 +313,8 @@ export default function AuthPage() {
                                 />
                             </>
                         )}
+
+                        {authError && <Alert severity="error" sx={{ mt: 2 }}>{authError}</Alert>}
 
                         <Button
                             fullWidth

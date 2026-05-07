@@ -46,10 +46,10 @@ function buildRolePageRoute(page: AppPage, role: UserRole): RouteObject {
 function buildRoleRoutes(role: UserRole): RouteObject {
   return {
     path: role,
-    element: <AuthGuard />, // require auth for any /<role> area
+    element: <AuthGuard expectedRole={role} />,
     children: [
       {
-        element: <AppShell />, // shell for authenticated UI
+        element: <AppShell />,
         children: [
           ...getPagesForRole(role).map((page) => buildRolePageRoute(page, role)),
           { path: '*', element: <AuthRedirect /> },
@@ -58,6 +58,7 @@ function buildRoleRoutes(role: UserRole): RouteObject {
     ],
   };
 }
+
 
 export const router = createBrowserRouter([
   { path: '/', element: <AuthRedirect /> },

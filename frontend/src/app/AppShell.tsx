@@ -1,36 +1,24 @@
-import { startTransition } from 'react';
 import {
   AppBar,
   Box,
   Button,
   Container,
-  FormControl,
-  MenuItem,
-  Select,
   Stack,
   Toolbar,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom';
 import { AppBreadcrumbs } from '../components/AppBreadcrumbs';
 import { getActiveNavPage, getNavPagesForRole } from './page-registry';
-import { roleHomePaths, roleLabels, roles, type UserRole } from './roles';
-import { useRoleSession } from '../features/session/RoleSessionContext';
+import { roleLabels, type UserRole } from './roles';
+import { useAuthSession } from '../features/session/AuthSessionContext';
 
 function AppShell() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { role, setRole } = useRoleSession();
+  const { user } = useAuthSession();
+  const role = (user?.role ?? 'customer') as UserRole;
   const navPages = getNavPagesForRole(role);
   const activeNavPage = getActiveNavPage(role, location.pathname);
-
-  function handleRoleChange(nextRole: UserRole) {
-    setRole(nextRole);
-
-    startTransition(() => {
-      navigate(roleHomePaths[nextRole]);
-    });
-  }
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
@@ -90,46 +78,9 @@ function AppShell() {
                 );
               })}
 
-              <FormControl
-                size="small"
-                sx={{
-                  minWidth: 164,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '999px',
-                    backgroundColor: 'secondary.main',
-                    color: 'common.white',
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'common.white',
-                  },
-                  '& .MuiSelect-select': {
-                    py: 1,
-                    pr: 4.5,
-                    pl: 2,
-                    color: 'common.white',
-                  },
-                }}
-              >
-              <Select
-                value={role}
-                onChange={(event) => handleRoleChange(event.target.value as UserRole)}
-              >
-                {roles.map((availableRole) => (
-                  <MenuItem key={availableRole} value={availableRole}>
-                    {roleLabels[availableRole]}
-                  </MenuItem>
-                ))}
-              </Select>
-              </FormControl>
+              <Typography sx={{ color: 'common.white', fontWeight: 500, textTransform: 'capitalize' }}>
+                {roleLabels[role]}
+              </Typography>
             </Stack>
           </Toolbar>
         </Container>
