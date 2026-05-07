@@ -8,24 +8,17 @@ export type AppPage = {
   path: string;
   title: string;
   navLabel: string;
-  component?: ComponentType;
+  component?: ComponentType<{page: AppPage}>;
   showInNav?: boolean;
 };
 
 export const appPages: AppPage[] = [
   {
-    id: 'customer-overview',
-    role: 'customer',
-    path: '/customer',
-    title: 'Customer',
-    navLabel: 'Home',
-  },
-  {
     id: 'customer-events',
     role: 'customer',
-    path: '/customer/events',
-    title: 'Events',
-    navLabel: 'Events',
+    path: '/customer',
+    title: 'Browse Events',
+    navLabel: 'Browse Events',
     component: EventListPage,
   },
   {
@@ -36,48 +29,20 @@ export const appPages: AppPage[] = [
     navLabel: 'My Tickets',
   },
   {
-    id: 'organizer-overview',
-    role: 'organizer',
-    path: '/organizer',
-    title: 'Organizer',
-    navLabel: 'Home',
-  },
-  {
     id: 'organizer-events',
     role: 'organizer',
-    path: '/organizer/events',
-    title: 'Events',
+    path: '/organizer',
+    title: 'My Events',
     navLabel: 'Events',
-  },
-  {
-    id: 'organizer-events-new',
-    role: 'organizer',
-    path: '/organizer/events/new',
-    title: 'Create Event',
-    navLabel: 'Create Event',
     showInNav: false,
   },
   {
-    id: 'organizer-events-edit',
-    role: 'organizer',
-    path: '/organizer/events/edit',
-    title: 'Edit Event',
-    navLabel: 'Edit Event',
-    showInNav: false,
-  },
-  {
-    id: 'staff-overview',
+    id: 'staff-events',
     role: 'staff',
     path: '/staff',
-    title: 'Staff',
+    title: 'Select Event for Validation',
     navLabel: 'Home',
-  },
-  {
-    id: 'staff-validation',
-    role: 'staff',
-    path: '/staff/validation',
-    title: 'Validation',
-    navLabel: 'Validation',
+    showInNav: false,
   },
 ];
 
@@ -106,12 +71,6 @@ export function getPagesForRole(role: UserRole): AppPage[] {
 
 export function getNavPagesForRole(role: UserRole): AppPage[] {
   return getPagesForRole(role).filter((page) => page.showInNav !== false);
-}
-
-export function getBreadcrumbPages(pathname: string): AppPage[] {
-  return appPages
-    .filter((page) => isPathWithin(page.path, pathname))
-    .sort((firstPage, secondPage) => firstPage.path.length - secondPage.path.length);
 }
 
 export function getActiveNavPage(role: UserRole, pathname: string): AppPage | null {

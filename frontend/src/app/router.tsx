@@ -34,7 +34,7 @@ function AuthRedirect() {
 function buildRolePageRoute(page: AppPage, role: UserRole): RouteObject {
   const relativePath = getRoleRelativePath(role, page.path);
   const PageComponent = page.component;
-  const element = PageComponent ? <PageComponent /> : <PagePlaceholder page={page} />;
+  const element = PageComponent ? <PageComponent page={page} /> : <PagePlaceholder page={page} />;
 
   if (relativePath === '') {
     return { index: true, element };
