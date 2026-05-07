@@ -55,6 +55,7 @@ public class AuthService {
         }
 
         User user = new User();
+        user.setUsername(request.username());
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole(role);
@@ -118,7 +119,7 @@ public class AuthService {
     }
 
     private AuthUserDto toDto(User user) {
-        return new AuthUserDto(user.getId(), user.getEmail(), user.getRole());
+        return new AuthUserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
     }
 
     private String normalizeEmail(String email) {

@@ -2,6 +2,7 @@ import type {UserRole} from "../../app/roles";
 
 export type AuthUser = {
     id: string;
+    username: string;
     email: string;
     role: UserRole;
 };
@@ -9,6 +10,18 @@ export type AuthUser = {
 type AuthResponse = {
     user: AuthUser;
 };
+
+type LoginRequestDto = {
+    email: string;
+    password: string;
+}
+
+type SignupRequestDto = {
+    username: string;
+    email: string;
+    password: string;
+    role: UserRole;
+}
 
 async function readJsonResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
@@ -70,23 +83,19 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
     return data.user;
 }
 
-export async function loginRequest(email: string, password: string): Promise<AuthUser> {
+export async function loginRequest(dto: LoginRequestDto): Promise<AuthUser> {
     const data = await requestJson<AuthResponse>('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(dto),
     });
 
     return data.user;
 }
 
-export async function signupRequest(
-    email: string,
-    password: string,
-    role: UserRole,
-): Promise<AuthUser> {
+export async function signupRequest(dto: SignupRequestDto): Promise<AuthUser> {
     const data = await requestJson<AuthResponse>('/api/auth/signup', {
         method: 'POST',
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify(dto),
     });
 
     return data.user;

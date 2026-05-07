@@ -12,7 +12,7 @@ type AuthSessionContextValue = {
     status: 'anonymous' | 'authenticated' | 'loading';
     user: AuthUser | null;
     login: (email: string, password: string) => Promise<AuthUser>;
-    signup: (email: string, password: string, role: UserRole) => Promise<AuthUser>;
+    signup: (username: string, email: string, password: string, role: UserRole) => Promise<AuthUser>;
     logout: () => Promise<void>;
 };
 
@@ -62,14 +62,14 @@ export function AuthSessionProvider({children}: AuthSessionProviderProps) {
     }, []);
 
     async function login(email: string, password: string): Promise<AuthUser> {
-        const loggedInUser = await loginRequest(email, password);
+        const loggedInUser = await loginRequest({email, password});
         setUser(loggedInUser);
         setStatus('authenticated');
         return loggedInUser;
     }
 
-    async function signup(email: string, password: string, role: UserRole): Promise<AuthUser> {
-        const createdUser = await signupRequest(email, password, role);
+    async function signup(username: string, email: string, password: string, role: UserRole): Promise<AuthUser> {
+        const createdUser = await signupRequest({username, email, password, role});
         setUser(createdUser);
         setStatus('authenticated');
         return createdUser;

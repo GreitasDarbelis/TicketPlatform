@@ -8,7 +8,6 @@ import {
   Typography,
 } from '@mui/material';
 import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom';
-import { AppBreadcrumbs } from '../components/AppBreadcrumbs';
 import { getActiveNavPage, getNavPagesForRole } from './page-registry';
 import { roleLabels, type UserRole } from './roles';
 import { useAuthSession } from '../features/session/AuthSessionContext';
@@ -87,7 +86,6 @@ function AppShell() {
       </AppBar>
 
       <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
-        <AppBreadcrumbs />
         <Outlet />
       </Container>
     </Box>

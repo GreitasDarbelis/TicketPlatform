@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthSession } from "./AuthSessionContext";
 import { type UserRole, roleHomePaths} from "../../app/roles";
+import {CONFIRMATION_CODE} from "../../constants";
 import {
     Box,
     Button,
@@ -53,7 +54,9 @@ export default function AuthPage() {
 
     const [tabValue, setTabValue] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [authError, setAuthError] = useState<string | null>(null);
+
+    const [loginError, setLoginError] = useState<string | null>(null);
+    const [signupError, setSignupError] = useState<string | null>(null);
 
     const [loginData, setLoginData] = useState({ email: '', password: '' });
     const [signupData, setSignupData] = useState({
@@ -67,14 +70,18 @@ export default function AuthPage() {
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
+        setLoginError(null);
+        setSignupError(null);
     };
 
     const handleLoginChange = (field: string, value: string) => {
         setLoginData((prev) => ({ ...prev, [field]: value }));
+        if (loginError) setLoginError(null);
     };
 
     const handleSignupChange = (field: string, value: string) => {
         setSignupData((prev) => ({ ...prev, [field]: value }));
+        if (signupError) setSignupError(null);
     };
 
     const redirectAfterAuth = (role: UserRole) => {
@@ -91,39 +98,62 @@ export default function AuthPage() {
     };
 
     const handleLoginSubmit = async () => {
-        setAuthError(null);
+        setLoginError(null);
+
+        if (!loginData.email.trim() || !loginData.password.trim()) {
+            setLoginError('Please fill in all fields.');
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const user = await login(loginData.email, loginData.password);
             redirectAfterAuth(user.role);
         } catch (error) {
-            setAuthError(error instanceof Error ? error.message : 'Login failed.');
+            setLoginError(error instanceof Error ? error.message : 'Login failed.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleSignupSubmit = async () => {
-        setAuthError(null);
+        setSignupError(null);
+
+        const missingRequired =
+            !signupData.username.trim() ||
+            !signupData.email.trim() ||
+            !signupData.password.trim() ||
+            !signupData.confirmPassword.trim() ||
+            (requiresConfirmationCode && !signupData.confirmationCode.trim());
+
+        if (missingRequired) {
+            setSignupError('Please fill in all fields.');
+            return;
+        }
 
         if (signupData.password !== signupData.confirmPassword) {
-            setAuthError('Passwords do not match.');
+            setSignupError('Passwords do not match.');
+            return;
+        }
+
+        if (requiresConfirmationCode && signupData.confirmationCode !== CONFIRMATION_CODE) {
+            setSignupError('Incorrect confirmation code.');
             return;
         }
 
         setIsSubmitting(true);
         try {
-            const user = await signup(signupData.email, signupData.password, signupData.role as UserRole);
+            const user = await signup(signupData.username, signupData.email, signupData.password, signupData.role as UserRole);
             redirectAfterAuth(user.role);
         } catch (error) {
-            setAuthError(error instanceof Error ? error.message : 'Sign up failed.');
+            setSignupError(error instanceof Error ? error.message : 'Sign up failed.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const requiresConfirmationCode =
-        signupData.role === 'Organizer' || signupData.role === 'Staff';
+        signupData.role === 'organizer' || signupData.role === 'staff';
 
     return (
         <Box sx={{ minHeight: '100vh', p: 4, display: 'grid', placeItems: 'center', background: `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.primary.main} 100%)` }}>
@@ -222,6 +252,9 @@ export default function AuthPage() {
                                 },
                             }}
                         />
+
+                        {loginError && <Alert severity="error" sx={{ mt: 2 }}>{loginError}</Alert>}
+
                         <Button
                             fullWidth
                             variant="contained"
@@ -314,7 +347,7 @@ export default function AuthPage() {
                             </>
                         )}
 
-                        {authError && <Alert severity="error" sx={{ mt: 2 }}>{authError}</Alert>}
+                        {signupError && <Alert severity="error" sx={{ mt: 2 }}>{signupError}</Alert>}
 
                         <Button
                             fullWidth
