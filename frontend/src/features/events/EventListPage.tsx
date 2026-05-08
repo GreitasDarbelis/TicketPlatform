@@ -11,6 +11,7 @@ import {
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
 import Grid from '@mui/material/Grid';
+import { useNavigate } from 'react-router-dom';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
 import { fetchEvents } from './api';
@@ -40,6 +41,7 @@ export function EventListPage() {
   const [events, setEvents] = useState<EventSummary[]>([]); // list of events
   const [isLoading, setIsLoading] = useState(true); // loading state for fetching events
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => { // load events on page load
     const controller = new AbortController();
@@ -98,6 +100,7 @@ export function EventListPage() {
               <Grid key={event.id} size={{ xs: 12, md: 6, xl: 4 }}>
                 <Card
                   elevation={0}
+                  onClick={() => navigate(`/customer/events/${event.id}`)}
                   sx={{
                     height: '100%',
                     overflow: 'hidden',
