@@ -36,10 +36,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authenticationProvider(daoAuthenticationProvider)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/signup").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, ApiPaths.Auth.LOGIN, ApiPaths.Auth.SIGNUP).permitAll()
+                        .requestMatchers(HttpMethod.GET, ApiPaths.Auth.ME).authenticated()
+                        .requestMatchers(HttpMethod.POST, ApiPaths.Auth.LOGOUT).permitAll()
+                        .requestMatchers(HttpMethod.GET, ApiPaths.Events.ANY).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -72,7 +72,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of(ApiPaths.Cors.FRONTEND_LOCAL));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

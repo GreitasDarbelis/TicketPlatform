@@ -1,4 +1,5 @@
 import type {UserRole} from "../../app/roles";
+import { API_PATHS } from "../../app/api-paths";
 
 export type AuthUser = {
     id: string;
@@ -67,7 +68,7 @@ async function requestVoid(url: string, init: RequestInit): Promise<void> {
 }
 
 export async function fetchCurrentUser(): Promise<AuthUser | null> {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch(API_PATHS.auth.me, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -75,7 +76,7 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
         },
     });
 
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 403) {
         return null;
     }
 
@@ -84,7 +85,7 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
 }
 
 export async function loginRequest(dto: LoginRequestDto): Promise<AuthUser> {
-    const data = await requestJson<AuthResponse>('/api/auth/login', {
+    const data = await requestJson<AuthResponse>(API_PATHS.auth.login, {
         method: 'POST',
         body: JSON.stringify(dto),
     });
@@ -93,7 +94,7 @@ export async function loginRequest(dto: LoginRequestDto): Promise<AuthUser> {
 }
 
 export async function signupRequest(dto: SignupRequestDto): Promise<AuthUser> {
-    const data = await requestJson<AuthResponse>('/api/auth/signup', {
+    const data = await requestJson<AuthResponse>(API_PATHS.auth.signup, {
         method: 'POST',
         body: JSON.stringify(dto),
     });
@@ -102,7 +103,7 @@ export async function signupRequest(dto: SignupRequestDto): Promise<AuthUser> {
 }
 
 export async function logoutRequest(): Promise<void> {
-    await requestVoid('/api/auth/logout', {
+    await requestVoid(API_PATHS.auth.logout, {
         method: 'POST',
     });
 }
