@@ -11,12 +11,11 @@ import {
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
 import Grid from '@mui/material/Grid';
+import { useNavigate } from 'react-router-dom';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
 import { fetchEvents } from './api';
 import type { EventSummary } from './types';
-import { useNavigate } from 'react-router-dom';
-import { useRoleSession } from '../session/RoleSessionContext';
 
 
 function formatEventDate(value: string): string { // formats into "20 Mar 2024, 7:30 PM"
@@ -43,7 +42,6 @@ export function EventListPage() {
   const [isLoading, setIsLoading] = useState(true); // loading state for fetching events
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { role } = useRoleSession();
 
   useEffect(() => { // load events on page load
     const controller = new AbortController();
@@ -102,11 +100,7 @@ export function EventListPage() {
               <Grid key={event.id} size={{ xs: 12, md: 6, xl: 4 }}>
                 <Card
                   elevation={0}
-                  onClick={() => {
-                    if (role === 'organizer') {
-                      navigate(`/organizer/events/edit/${event.id}`);
-                    }
-                  }}
+                  onClick={() => navigate(`/customer/events/${event.id}`)}
                   sx={{
                     height: '100%',
                     overflow: 'hidden',
@@ -116,7 +110,7 @@ export function EventListPage() {
                     transition: 'box-shadow 0.3s',
                     '&:hover': {
                       boxShadow: '0 8px 32px rgba(36, 148, 142, 0.25), 0 4px 14px rgba(0,0,0,0.18)',
-                      cursor: role === 'organizer' ? 'pointer' : 'default',
+                      cursor: 'pointer',
                     },
                     '&:hover .event-card-image': {
                       transform: 'scale(1.07)',
