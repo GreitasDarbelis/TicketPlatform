@@ -1,19 +1,19 @@
-import { startTransition } from 'react';
+import { startTransition, useEffect, useState, type MouseEvent } from 'react';
 import {
   AppBar,
   Box,
   Button,
   Container,
-  FormControl,
+  IconButton,
+  Menu,
   MenuItem,
-  Select,
   Stack,
   Toolbar,
   Typography,
 } from '@mui/material';
+import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import { Link as RouterLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AppBreadcrumbs } from '../components/AppBreadcrumbs';
-import { getActiveNavPage, getNavPagesForRole } from './page-registry';
+import { getNavPagesForRole } from './page-registry';
 import { roleHomePaths, roleLabels, roles, type UserRole } from './roles';
 import { useRoleSession } from '../features/session/RoleSessionContext';
 
@@ -21,10 +21,24 @@ function AppShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const { role, setRole } = useRoleSession();
+  const [roleMenuAnchor, setRoleMenuAnchor] = useState<HTMLElement | null>(null);
   const navPages = getNavPagesForRole(role);
-  const activeNavPage = getActiveNavPage(role, location.pathname);
+  const isRoleMenuOpen = Boolean(roleMenuAnchor);
+
+  useEffect(() => {
+    window.scrollTo({ left: 0, top: 0 });
+  }, [location.pathname]);
+
+  function handleRoleMenuOpen(event: MouseEvent<HTMLElement>) {
+    setRoleMenuAnchor(event.currentTarget);
+  }
+
+  function handleRoleMenuClose() {
+    setRoleMenuAnchor(null);
+  }
 
   function handleRoleChange(nextRole: UserRole) {
+    setRoleMenuAnchor(null);
     setRole(nextRole);
 
     startTransition(() => {
@@ -35,12 +49,11 @@ function AppShell() {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
       <AppBar position="sticky" color="primary" elevation={0}>
-        <Container maxWidth="xl">
+        <Container maxWidth={false} sx={{ px: { xs: 3, md: 8, lg: 12.5 } }}>
           <Toolbar
             disableGutters
             sx={{
-              minHeight: 88,
-              py: 1.5,
+              minHeight: { xs: 96, md: 140 },
               gap: 3,
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -48,15 +61,23 @@ function AppShell() {
             }}
           >
             <Typography
-              variant="h5"
-              sx={{ color: 'common.white', fontWeight: 500, letterSpacing: '-0.02em' }}
+              component={RouterLink}
+              to={roleHomePaths[role]}
+              variant="h3"
+              sx={{
+                color: 'common.white',
+                fontSize: { xs: '2rem', md: '2.7rem' },
+                fontWeight: 500,
+                letterSpacing: 0,
+                lineHeight: 1,
+              }}
             >
-              TicketPlatform
+              Greitas Darbelis
             </Typography>
 
             <Stack
               direction="row"
-              spacing={1}
+              spacing={{ xs: 1.5, md: 4 }}
               sx={{
                 alignItems: 'center',
                 flexWrap: 'wrap',
@@ -65,8 +86,6 @@ function AppShell() {
               }}
             >
               {navPages.map((page) => {
-                const isActive = page.path === activeNavPage?.path;
-
                 return (
                   <Button
                     key={page.path}
@@ -74,14 +93,15 @@ function AppShell() {
                     to={page.path}
                     disableElevation
                     sx={{
-                      px: 2.25,
+                      px: { xs: 1.5, md: 2 },
                       py: 1,
                       minWidth: 'auto',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: 'common.white',
-                      backgroundColor: isActive ? 'primary.main' : 'transparent',
+                      fontSize: { xs: '1rem', md: '1.35rem' },
+                      backgroundColor: 'transparent',
                       '&:hover': {
-                        backgroundColor: isActive ? 'primary.main' : 'primary.dark',
+                        backgroundColor: 'primary.dark',
                       },
                     }}
                   >
@@ -90,53 +110,46 @@ function AppShell() {
                 );
               })}
 
-              <FormControl
-                size="small"
+              <IconButton
+                aria-label="Open role menu"
+                aria-controls={isRoleMenuOpen ? 'role-menu' : undefined}
+                aria-haspopup="menu"
+                aria-expanded={isRoleMenuOpen ? 'true' : undefined}
+                onClick={handleRoleMenuOpen}
                 sx={{
-                  minWidth: 164,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '999px',
-                    backgroundColor: 'secondary.main',
-                    color: 'common.white',
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& .MuiSelect-icon': {
-                    color: 'common.white',
-                  },
-                  '& .MuiSelect-select': {
-                    py: 1,
-                    pr: 4.5,
-                    pl: 2,
-                    color: 'common.white',
-                  },
+                  width: { xs: 56, md: 78 },
+                  height: { xs: 56, md: 78 },
+                  borderRadius: '50%',
+                  bgcolor: 'primary.main',
+                  color: 'common.white',
+                  flex: '0 0 auto',
+                  '&:hover': { bgcolor: 'primary.dark' },
                 }}
               >
-              <Select
-                value={role}
-                onChange={(event) => handleRoleChange(event.target.value as UserRole)}
+                <PersonOutlineOutlined sx={{ fontSize: { xs: 30, md: 40 } }} />
+              </IconButton>
+              <Menu
+                id="role-menu"
+                anchorEl={roleMenuAnchor}
+                open={isRoleMenuOpen}
+                onClose={handleRoleMenuClose}
               >
                 {roles.map((availableRole) => (
-                  <MenuItem key={availableRole} value={availableRole}>
+                  <MenuItem
+                    key={availableRole}
+                    selected={availableRole === role}
+                    onClick={() => handleRoleChange(availableRole)}
+                  >
                     {roleLabels[availableRole]}
                   </MenuItem>
                 ))}
-              </Select>
-              </FormControl>
+              </Menu>
             </Stack>
           </Toolbar>
         </Container>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
-        <AppBreadcrumbs />
+      <Container maxWidth={false} sx={{ px: { xs: 3, md: 8, lg: 12.5 }, py: { xs: 4, md: 7.5 } }}>
         <Outlet />
       </Container>
     </Box>

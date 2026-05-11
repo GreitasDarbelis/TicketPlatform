@@ -4,6 +4,8 @@ import { EventDetailsPage } from '../features/events/EventDetailsPage';
 import CreateEventPage from '../features/events/CreateEventPage';
 import EditEventPage from '../features/events/EditEventPage';
 import { OrganizerEventsPage } from '../features/events/OrganizerEventsPage';
+import { MyEventsPage } from '../features/tickets/MyEventsPage';
+import { PurchasedTicketsPage } from '../features/tickets/PurchasedTicketsPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -23,13 +25,14 @@ export const appPages: AppPage[] = [
     path: '/customer',
     title: 'Customer',
     navLabel: 'Home',
+    showInNav: false,
   },
   {
     id: 'customer-events',
     role: 'customer',
     path: '/customer/events',
-    title: 'Events',
-    navLabel: 'Events',
+    title: 'Browse Events',
+    navLabel: 'Browse Events',
     component: EventListPage,
   },
   {
@@ -42,11 +45,21 @@ export const appPages: AppPage[] = [
     component: EventDetailsPage,
   },
   {
+    id: 'customer-my-events',
+    role: 'customer',
+    path: '/customer/my-events',
+    title: 'My Events',
+    navLabel: 'My Events',
+    component: MyEventsPage,
+  },
+  {
     id: 'customer-tickets',
     role: 'customer',
-    path: '/customer/tickets',
-    title: 'My Tickets',
-    navLabel: 'My Tickets',
+    path: '/customer/tickets/:eventId',
+    title: 'Your Tickets',
+    navLabel: 'Your Tickets',
+    showInNav: false,
+    component: PurchasedTicketsPage,
   },
   {
     id: 'organizer-overview',
