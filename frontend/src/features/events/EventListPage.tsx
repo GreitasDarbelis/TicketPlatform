@@ -28,6 +28,14 @@ export function EventListPage({page}: EventListPageProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  function getEventDestination(event: EventSummary): string {
+    if (page.role === 'staff') {
+      return `/staff/events/${event.id}/validate`;
+    }
+
+    return `/customer/events/${event.id}`;
+  }
+
   useEffect(() => { // load events on page load
     const controller = new AbortController();
 
@@ -85,7 +93,7 @@ export function EventListPage({page}: EventListPageProps) {
               <Grid key={event.id} size={{ xs: 12, md: 6, xl: 4 }}>
                 <Card
                   elevation={0}
-                  onClick={() => navigate(`/customer/events/${event.id}`)}
+                  onClick={() => navigate(getEventDestination(event))}
                   sx={{
                     height: '100%',
                     overflow: 'hidden',
