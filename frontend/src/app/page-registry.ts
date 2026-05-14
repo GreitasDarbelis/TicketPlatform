@@ -8,6 +8,7 @@ import { MockPaymentPage } from '../features/tickets/MockPaymentPage';
 import { MyEventsPage } from '../features/tickets/MyEventsPage';
 import { PurchaseTicketsPage } from '../features/tickets/PurchaseTicketsPage';
 import { TicketDetailsPage } from '../features/tickets/TicketDetailsPage';
+import { StaffTicketValidationPage } from '../features/tickets/StaffTicketValidationPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -105,7 +106,16 @@ export const appPages: AppPage[] = [
     path: '/staff',
     title: 'Select Event for Validation',
     navLabel: 'Home',
+    component: EventListPage,
+  },
+  {
+    id: 'staff-event-validation',
+    role: 'staff',
+    path: '/staff/events/:eventId/validate',
+    title: 'Validate Tickets',
+    navLabel: 'Validate Tickets',
     showInNav: false,
+    component: StaffTicketValidationPage,
   },
 ];
 
