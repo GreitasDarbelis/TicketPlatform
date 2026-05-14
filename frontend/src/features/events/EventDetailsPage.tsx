@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   Alert,
   Box,
@@ -15,20 +14,9 @@ import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
 import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import AttachMoneyRounded from '@mui/icons-material/AttachMoneyRounded';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { fetchEventById } from './api';
-import type { EventSummary } from './types';
-
-
-function formatEventDate(value: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-  }).format(new Date(value));
-}
-
-function getEventImage(imageData: string | null): string {
-  return imageData ?? '';
-}
+import { formatEventDate, getEventImage } from './display';
+import { useEventDetails } from './useEventDetails';
+import { formatTicketPrice, MOCK_TICKET_PRICE } from '../tickets/mockTicketing';
 
 type DetailRowProps = {
   icon: React.ReactNode;
@@ -57,44 +45,7 @@ function DetailRow({ icon, children, accent = false }: DetailRowProps) {
 
 export function EventDetailsPage() {
   const { eventId } = useParams<{ eventId: string }>();
-  const [event, setEvent] = useState<EventSummary | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadEventDetails() {
-      if (!eventId) {
-        setErrorMessage('Event was not found.');
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setErrorMessage(null);
-        const loadedEvent = await fetchEventById(eventId, controller.signal);
-        setEvent(loadedEvent);
-      } catch {
-        if (controller.signal.aborted) {
-          return;
-        }
-
-        setErrorMessage('Unable to load this event right now.');
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadEventDetails();
-
-    return () => {
-      controller.abort();
-    };
-  }, [eventId]);
+  const { event, isLoading, errorMessage } = useEventDetails(eventId);
 
   return (
     <Stack spacing={3}>
@@ -147,7 +98,7 @@ export function EventDetailsPage() {
                   Organized by {event.organizerEmail}
                 </DetailRow>
                 <DetailRow icon={<AttachMoneyRounded sx={{ fontSize: 22 }} />} accent>
-                  $25
+                  {formatTicketPrice(MOCK_TICKET_PRICE)}
                 </DetailRow>
               </Stack>
 
@@ -161,6 +112,8 @@ export function EventDetailsPage() {
               </Box>
 
               <Button
+                component={RouterLink}
+                to={`/customer/events/${event.id}/purchase`}
                 variant="contained"
                 color="secondary"
                 size="large"
