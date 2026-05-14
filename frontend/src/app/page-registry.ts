@@ -1,5 +1,13 @@
-import type { ComponentType } from 'react';
+import { type ComponentType } from 'react';
 import { EventListPage } from '../features/events/EventListPage';
+import { EventDetailsPage } from '../features/events/EventDetailsPage';
+import CreateEventPage from '../features/events/CreateEventPage';
+import EditEventPage from '../features/events/EditEventPage';
+import { OrganizerEventsPage } from '../features/events/OrganizerEventsPage';
+import { MockPaymentPage } from '../features/tickets/MockPaymentPage';
+import { MyEventsPage } from '../features/tickets/MyEventsPage';
+import { PurchaseTicketsPage } from '../features/tickets/PurchaseTicketsPage';
+import { TicketDetailsPage } from '../features/tickets/TicketDetailsPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -22,11 +30,48 @@ export const appPages: AppPage[] = [
     component: EventListPage,
   },
   {
+    id: 'customer-event-details',
+    role: 'customer',
+    path: '/customer/events/:eventId',
+    title: 'Event Details',
+    navLabel: 'Event Details',
+    showInNav: false,
+    component: EventDetailsPage,
+  },
+  {
+    id: 'customer-event-purchase',
+    role: 'customer',
+    path: '/customer/events/:eventId/purchase',
+    title: 'Purchase Tickets',
+    navLabel: 'Purchase Tickets',
+    showInNav: false,
+    component: PurchaseTicketsPage,
+  },
+  {
+    id: 'customer-event-payment',
+    role: 'customer',
+    path: '/customer/events/:eventId/payment',
+    title: 'Payment',
+    navLabel: 'Payment',
+    showInNav: false,
+    component: MockPaymentPage,
+  },
+  {
     id: 'customer-tickets',
     role: 'customer',
     path: '/customer/tickets',
-    title: 'My Tickets',
-    navLabel: 'My Tickets',
+    title: 'My Events',
+    navLabel: 'My Events',
+    component: MyEventsPage,
+  },
+  {
+    id: 'customer-ticket-details',
+    role: 'customer',
+    path: '/customer/tickets/:ticketId',
+    title: 'Ticket',
+    navLabel: 'Ticket',
+    showInNav: false,
+    component: TicketDetailsPage,
   },
   {
     id: 'organizer-events',
@@ -34,10 +79,28 @@ export const appPages: AppPage[] = [
     path: '/organizer',
     title: 'My Events',
     navLabel: 'Events',
-    showInNav: false,
+    component: OrganizerEventsPage,
   },
   {
-    id: 'staff-events',
+    id: 'organizer-events-new',
+    role: 'organizer',
+    path: '/organizer/events/new',
+    title: 'Create Event',
+    navLabel: 'Create Event',
+    showInNav: false,
+    component: CreateEventPage,
+  },
+  {
+    id: 'organizer-events-edit',
+    role: 'organizer',
+    path: '/organizer/events/edit/:id',
+    title: 'Edit Event',
+    navLabel: 'Edit Event',
+    showInNav: false,
+    component: EditEventPage,
+  },
+  {
+    id: 'staff-overview',
     role: 'staff',
     path: '/staff',
     title: 'Select Event for Validation',
@@ -74,11 +137,21 @@ export function getNavPagesForRole(role: UserRole): AppPage[] {
 }
 
 export function getActiveNavPage(role: UserRole, pathname: string): AppPage | null {
-  const matchingNavPages = getNavPagesForRole(role)
-    .filter((page) => isPathWithin(page.path, pathname))
-    .sort((firstPage, secondPage) => secondPage.path.length - firstPage.path.length);
+  const navPages = getNavPagesForRole(role);
+  const allPages = getPagesForRole(role);
 
-  return matchingNavPages[0] ?? null;
+  const exactNavMatch = navPages.find((page) => normalizePath(page.path) === normalizePath(pathname));
+  if (exactNavMatch) {
+    return exactNavMatch;
+  }
+
+  const currentPage = allPages.find((page) => normalizePath(page.path) === normalizePath(pathname));
+
+  if (currentPage && currentPage.showInNav !== false) {
+    return currentPage;
+  }
+
+  return null;
 }
 
 export function getImmediateChildPages(parentPath: string): AppPage[] {

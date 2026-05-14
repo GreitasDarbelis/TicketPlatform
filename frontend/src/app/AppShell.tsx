@@ -13,24 +13,24 @@ function AppShell() {
   const navPages = getNavPagesForRole(role);
   const activeNavPage = getActiveNavPage(role, location.pathname);
 
-    const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-    const menuOpen = Boolean(menuAnchor);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const menuOpen = Boolean(menuAnchor);
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setMenuAnchor(event.currentTarget);
-    };
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+      setMenuAnchor(event.currentTarget);
+  };
 
-    const handleMenuClose = () => {
-        setMenuAnchor(null);
-    };
+  const handleMenuClose = () => {
+      setMenuAnchor(null);
+  };
 
-    const handleSignOut = async () => {
-        handleMenuClose();
-        await logout();
-    };
+  const handleSignOut = async () => {
+      handleMenuClose();
+      await logout();
+  };
 
-    const username = user?.username ?? 'Guest';
-    const roleLabel = roleLabels[role];
+  const username = user?.username ?? 'Guest';
+  const roleLabel = roleLabels[role];
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
