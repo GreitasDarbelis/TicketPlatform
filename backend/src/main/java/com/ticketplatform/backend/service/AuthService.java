@@ -115,7 +115,8 @@ public class AuthService {
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        request.getSession(true);
+        HttpSession session = request.getSession(true);
+        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
     }
 
     private AuthUserDto toDto(User user) {
