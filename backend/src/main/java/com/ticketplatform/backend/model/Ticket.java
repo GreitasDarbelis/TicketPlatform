@@ -22,7 +22,7 @@ public class Ticket {
     private User attendee;
 
     @Column(unique = true, nullable = false)
-    private String qrCode;
+    private String ticketCode;
 
     @Column(nullable = false)
     private String status; // E.g., "VALID", "USED"
