@@ -35,6 +35,8 @@ public class Event {
 
     private Integer totalTickets;
 
+    private Integer availableTickets;
+
     // REQUIREMENT: Data consistency; Optimistic locking
     // If two organizers attempt to edit an event simultaneously,
     // the system will throw an ObjectOptimisticLockingFailureException.

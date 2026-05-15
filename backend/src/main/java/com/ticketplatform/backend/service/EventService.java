@@ -5,6 +5,7 @@ import com.ticketplatform.backend.dto.PublicEventDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.model.User;
 import com.ticketplatform.backend.repository.EventRepository;
+import com.ticketplatform.backend.repository.TicketRepository;
 import com.ticketplatform.backend.repository.UserRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -31,10 +32,12 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, TicketRepository ticketRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @Transactional
@@ -48,6 +51,7 @@ public class EventService {
         event.setLocation(request.location().trim());
         event.setImageData(blankToNull(request.imageUrl()));
         event.setTotalTickets(request.totalTickets());
+        event.setAvailableTickets(request.totalTickets());
         event.setOrganizer(resolveOrganizer(request.organizerEmail()));
 
         Event savedEvent = eventRepository.save(event);
@@ -67,7 +71,17 @@ public class EventService {
         existing.setDate(parseDateTime(request.date(), request.time()));
         existing.setLocation(request.location().trim());
         existing.setImageData(blankToNull(request.imageUrl()));
+
+        int soldTickets = (int) ticketRepository.findByEventId(id).size();
+        if (request.totalTickets() != null && request.totalTickets() < soldTickets) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot reduce total tickets below already sold tickets. Sold: " + soldTickets + ", Requested total: " + request.totalTickets()
+            );
+        }
+
         existing.setTotalTickets(request.totalTickets());
+        existing.setAvailableTickets(request.totalTickets() - soldTickets);
         existing.setOrganizer(resolveOrganizer(request.organizerEmail()));
 
         Event saved = eventRepository.save(existing);
