@@ -1,6 +1,5 @@
 import type { CreateEventRequest, EventSummary } from './types'; // matches the response from GET /api/events and GET /api/events/{id}
-
-const EVENTS_API_URL = '/api/events';
+import { API_PATHS } from "../../app/api-paths";
 
 async function readJsonResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -26,7 +25,7 @@ async function readJsonResponse<T>(response: Response): Promise<T> {
 }
 
 export async function fetchEvents(signal?: AbortSignal): Promise<EventSummary[]> {
-  const response = await fetch(EVENTS_API_URL, {
+  const response = await fetch(API_PATHS.events.base, {
     method: 'GET',
     headers: {
       Accept: 'application/json',
@@ -38,7 +37,7 @@ export async function fetchEvents(signal?: AbortSignal): Promise<EventSummary[]>
 }
 
 export async function fetchEventById(eventId: string, signal?: AbortSignal): Promise<EventSummary> {
-  const response = await fetch(`${EVENTS_API_URL}/${eventId}`, {
+  const response = await fetch(API_PATHS.events.byId(eventId), {
     method: 'GET',
     headers: {
       Accept: 'application/json',
@@ -50,7 +49,7 @@ export async function fetchEventById(eventId: string, signal?: AbortSignal): Pro
 }
 
 export async function createEvent(payload: CreateEventRequest): Promise<EventSummary> {
-  const response = await fetch(EVENTS_API_URL, {
+  const response = await fetch(API_PATHS.events.base, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -63,7 +62,7 @@ export async function createEvent(payload: CreateEventRequest): Promise<EventSum
 }
 
 export async function updateEvent(eventId: string, payload: CreateEventRequest): Promise<EventSummary> {
-  const response = await fetch(`${EVENTS_API_URL}/${eventId}`, {
+  const response = await fetch(API_PATHS.events.byId(eventId), {
     method: 'PUT',
     headers: {
       Accept: 'application/json',

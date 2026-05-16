@@ -18,6 +18,10 @@ import { fetchEvents } from './api';
 import type { EventSummary } from './types';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
+type OrganizerEventsPageProps = {
+  page: AppPage;
+}
+
 function formatEventDate(value: string): string { // formats into "20 Mar 2024, 7:30 PM"
   return new Intl.DateTimeFormat('en-GB', {
     dateStyle: 'medium',
@@ -29,22 +33,14 @@ function getEventImage(imageData: string | null): string {
   return imageData ?? '';
 }
 
-const organizerEventsPage: AppPage = {
-  id: 'organizer-events',
-  role: 'organizer',
-  path: '/organizer/events',
-  title: 'Events',
-  navLabel: 'Events',
-};
-
-export function OrganizerEventsPage() {
+export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
   const [events, setEvents] = useState<EventSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const actions = (
-    <Button component={RouterLink} to="/organizer/events/new" variant="contained" disableElevation>
+    <Button component={RouterLink} to="/organizer/events/new" variant="contained" color="secondary" disableElevation>
       Create Event
     </Button>
   );
@@ -71,7 +67,7 @@ export function OrganizerEventsPage() {
   }, []);
 
   return (
-    <PageTemplate page={organizerEventsPage} actions={actions}>
+    <PageTemplate page={page} actions={actions}>
       <Stack spacing={3}>
         {isLoading ? (
           <Stack sx={{ minHeight: 240, alignItems: 'center', justifyContent: 'center' }}>

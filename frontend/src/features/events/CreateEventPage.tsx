@@ -14,15 +14,11 @@ import { PageTemplate } from '../../components/PageTemplate';
 import type { AppPage } from '../../app/page-registry';
 import { createEvent } from './api';
 
-const createEventPage: AppPage = {
-  id: 'organizer-events-new',
-  role: 'organizer',
-  path: '/organizer/events/new',
-  title: 'Create New Event',
-  navLabel: 'Create Event',
-};
+type CreateEventPageProps = {
+  page: AppPage;
+}
 
-export default function CreateEventPage() {
+export default function CreateEventPage({page}: CreateEventPageProps) {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('12:00');
@@ -72,7 +68,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <PageTemplate page={createEventPage}>
+    <PageTemplate page={page}>
       <Card elevation={0} sx={{ borderRadius: '14px' }}>
         <CardContent>
           <Box component="form" onSubmit={handleSubmit}>
@@ -187,7 +183,7 @@ export default function CreateEventPage() {
                   <Button
                     type="submit"
                     variant="contained"
-                    color="primary"
+                    color="secondary"
                     disabled={isSubmitting}
                     sx={{ flex: 1, py: 1.75, borderRadius: '8px' }}
                   >

@@ -18,15 +18,11 @@ import { fetchEvents } from './api';
 import { formatEventDate, getEventImage } from './display';
 import type { EventSummary } from './types';
 
-const customerEventsPage: AppPage = {
-  id: 'customer-events',
-  role: 'customer',
-  path: '/customer/events',
-  title: 'Browse Events',
-  navLabel: 'Browse Events',
-};
+type EventListPageProps = {
+  page: AppPage;
+}
 
-export function EventListPage() {
+export function EventListPage({page}: EventListPageProps) {
   const [events, setEvents] = useState<EventSummary[]>([]); // list of events
   const [isLoading, setIsLoading] = useState(true); // loading state for fetching events
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -62,7 +58,7 @@ export function EventListPage() {
   }, []);
   // the main content of the page - shows loading state, error message, empty state or list of events
   return (
-    <PageTemplate page={customerEventsPage}>
+    <PageTemplate page={page}>
       <Stack spacing={3}>
         {isLoading ? (
           <Stack sx={{ minHeight: 240, alignItems: 'center', justifyContent: 'center' }}>

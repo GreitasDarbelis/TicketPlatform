@@ -20,15 +20,11 @@ import { formatTicketPrice } from './mockTicketing';
 import { getPurchasedTickets } from './storage';
 import type { PurchasedTicket } from './types';
 
-const myEventsPage: AppPage = {
-  id: 'customer-tickets',
-  role: 'customer',
-  path: '/customer/tickets',
-  title: 'My Events',
-  navLabel: 'My Events',
-};
+type MyEventsPageProps = {
+  page: AppPage;
+}
 
-export function MyEventsPage() {
+export function MyEventsPage({page}: MyEventsPageProps) {
   const [tickets, setTickets] = useState<PurchasedTicket[]>(() => getPurchasedTickets());
 
   useEffect(() => {
@@ -36,14 +32,7 @@ export function MyEventsPage() {
   }, []);
 
   return (
-    <PageTemplate
-      page={myEventsPage}
-      actions={
-        <Button component={RouterLink} to="/customer/events" variant="contained" color="secondary">
-          Browse Events
-        </Button>
-      }
-    >
+    <PageTemplate page={page}>
       {tickets.length === 0 ? (
         <Card elevation={0} sx={{ borderRadius: '24px' }}>
           <CardContent sx={{ p: 4 }}>

@@ -1,5 +1,4 @@
-import { createElement, type ComponentType } from 'react';
-import { Navigate } from 'react-router-dom';
+import { type ComponentType } from 'react';
 import { EventListPage } from '../features/events/EventListPage';
 import { EventDetailsPage } from '../features/events/EventDetailsPage';
 import CreateEventPage from '../features/events/CreateEventPage';
@@ -11,34 +10,21 @@ import { PurchaseTicketsPage } from '../features/tickets/PurchaseTicketsPage';
 import { TicketDetailsPage } from '../features/tickets/TicketDetailsPage';
 import { roleHomePaths, type UserRole } from './roles';
 
-function CustomerOverviewRedirect() {
-  return createElement(Navigate, { to: '/customer/events', replace: true });
-}
-
 export type AppPage = {
   id: string;
   role: UserRole;
   path: string;
   title: string;
   navLabel: string;
-  component?: ComponentType;
+  component?: ComponentType<{page: AppPage}>;
   showInNav?: boolean;
 };
 
 export const appPages: AppPage[] = [
   {
-    id: 'customer-overview',
-    role: 'customer',
-    path: '/customer',
-    title: 'Customer',
-    navLabel: 'Home',
-    showInNav: false,
-    component: CustomerOverviewRedirect,
-  },
-  {
     id: 'customer-events',
     role: 'customer',
-    path: '/customer/events',
+    path: '/customer',
     title: 'Browse Events',
     navLabel: 'Browse Events',
     component: EventListPage,
@@ -88,17 +74,10 @@ export const appPages: AppPage[] = [
     component: TicketDetailsPage,
   },
   {
-    id: 'organizer-overview',
-    role: 'organizer',
-    path: '/organizer',
-    title: 'Organizer',
-    navLabel: 'Home',
-  },
-  {
     id: 'organizer-events',
     role: 'organizer',
-    path: '/organizer/events',
-    title: 'Events',
+    path: '/organizer',
+    title: 'My Events',
     navLabel: 'Events',
     component: OrganizerEventsPage,
   },
@@ -124,15 +103,9 @@ export const appPages: AppPage[] = [
     id: 'staff-overview',
     role: 'staff',
     path: '/staff',
-    title: 'Staff',
+    title: 'Select Event for Validation',
     navLabel: 'Home',
-  },
-  {
-    id: 'staff-validation',
-    role: 'staff',
-    path: '/staff/validation',
-    title: 'Validation',
-    navLabel: 'Validation',
+    showInNav: false,
   },
 ];
 
@@ -163,18 +136,22 @@ export function getNavPagesForRole(role: UserRole): AppPage[] {
   return getPagesForRole(role).filter((page) => page.showInNav !== false);
 }
 
-export function getBreadcrumbPages(pathname: string): AppPage[] {
-  return appPages
-    .filter((page) => isPathWithin(page.path, pathname))
-    .sort((firstPage, secondPage) => firstPage.path.length - secondPage.path.length);
-}
-
 export function getActiveNavPage(role: UserRole, pathname: string): AppPage | null {
-  const matchingNavPages = getNavPagesForRole(role)
-    .filter((page) => isPathWithin(page.path, pathname))
-    .sort((firstPage, secondPage) => secondPage.path.length - firstPage.path.length);
+  const navPages = getNavPagesForRole(role);
+  const allPages = getPagesForRole(role);
 
-  return matchingNavPages[0] ?? null;
+  const exactNavMatch = navPages.find((page) => normalizePath(page.path) === normalizePath(pathname));
+  if (exactNavMatch) {
+    return exactNavMatch;
+  }
+
+  const currentPage = allPages.find((page) => normalizePath(page.path) === normalizePath(pathname));
+
+  if (currentPage && currentPage.showInNav !== false) {
+    return currentPage;
+  }
+
+  return null;
 }
 
 export function getImmediateChildPages(parentPath: string): AppPage[] {

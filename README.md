@@ -54,11 +54,10 @@ The database entity structure/tables will be generated automatically upon the fi
 Core frontend scaffold:
 
 - `src/app/page-registry.ts` is the single route catalog for pages and subpages.
-- `src/app/AppShell.tsx` provides the shared app bar, role switcher, and page navigation.
-- `src/components/AppBreadcrumbs.tsx` renders breadcrumbs automatically from the route catalog.
+- `src/app/AppShell.tsx` provides the shared app bar and page navigation.
 - `src/components/PageTemplate.tsx` is the shared page layout wrapper.
 - `src/components/PagePlaceholder.tsx` is the default stub to replace with real page content.
-- `src/features/session/RoleSessionContext.tsx` holds the temporary active role used before real auth exists.
+- `src/features/session/AuthSessionContext.tsx` provides authentication.
 
 How to add a new page:
 

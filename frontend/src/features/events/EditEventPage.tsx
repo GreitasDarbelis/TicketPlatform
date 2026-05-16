@@ -17,16 +17,11 @@ import type { AppPage } from '../../app/page-registry';
 import { fetchEventById, updateEvent } from './api';
 import type { CreateEventRequest } from './types';
 
-const editEventPage: AppPage = {
-  id: 'organizer-events-edit',
-  role: 'organizer',
-  path: '/organizer/events/edit',
-  title: 'Edit Event',
-  navLabel: 'Edit Event',
-  showInNav: false,
-};
+type EditEventPageProps = {
+  page: AppPage;
+}
 
-export default function EditEventPage() {
+export default function EditEventPage({page}: EditEventPageProps) {
   const params = useParams();
   const location = useLocation();
   const { id: paramId } = params as { id?: string };
@@ -154,7 +149,7 @@ export default function EditEventPage() {
   }
 
   return (
-    <PageTemplate page={editEventPage}>
+    <PageTemplate page={page}>
       <Card elevation={0} sx={{ borderRadius: '14px' }}>
         <CardContent>
           {isLoading ? (
@@ -278,7 +273,7 @@ export default function EditEventPage() {
                     <Button
                       type="submit"
                       variant="contained"
-                      color="primary"
+                      color="secondary"
                       disabled={isSubmitting}
                       sx={{ flex: 1, py: 1.75, borderRadius: '8px' }}
                     >

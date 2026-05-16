@@ -13,6 +13,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column()
+    private String username;
+
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -20,7 +23,7 @@ public class User {
     private String passwordHash;
 
     @Column(nullable = false)
-    private String role; // "ORGANIZER" or "ATTENDEE"
+    private String role;
 
     // REQUIREMENT: Data consistency; Optimistic locking
     // JPA Optimistic locking technique - version column preventing concurrent conflicting updates.
