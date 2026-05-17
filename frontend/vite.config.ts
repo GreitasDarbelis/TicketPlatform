@@ -6,6 +6,7 @@ const apiProxyTarget = process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:80
 export default defineConfig({
   plugins: [react()],
   server: {
+    allowedHosts: ['ticketplatform.up.railway.app'],
     proxy: {
       '/api': {
         target: apiProxyTarget,
