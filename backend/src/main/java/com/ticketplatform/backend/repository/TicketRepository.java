@@ -1,0 +1,18 @@
+package com.ticketplatform.backend.repository;
+
+import com.ticketplatform.backend.model.Ticket;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface TicketRepository extends JpaRepository<Ticket, UUID> {
+
+    @EntityGraph(attributePaths = "event")
+    List<Ticket> findByAttendeeIdOrderByPurchasedAtDescIdDesc(UUID attendeeId);
+
+    long countByEventId(UUID eventId);
+}

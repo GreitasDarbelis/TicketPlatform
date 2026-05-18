@@ -51,7 +51,7 @@ export function EventDetailsPage() {
     <Stack spacing={3}>
       <Button
         component={RouterLink}
-        to="/customer/events"
+        to="/customer"
         startIcon={<ArrowBackRounded />}
         variant="outlined"
         sx={{ alignSelf: 'flex-start', borderRadius: '12px', bgcolor: 'background.paper' }}

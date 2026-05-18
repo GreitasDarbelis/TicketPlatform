@@ -26,6 +26,15 @@ public final class ApiPaths {
         public static final String ANY = BASE + "/**";
     }
 
+    public static final class Tickets {
+        private Tickets() {
+        }
+
+        public static final String BASE = API + "/tickets";
+        public static final String ME = BASE + "/me";
+        public static final String ANY = BASE + "/**";
+    }
+
     public static final class Cors {
         private Cors() {
         }

@@ -67,9 +67,9 @@ export const appPages: AppPage[] = [
   {
     id: 'customer-ticket-details',
     role: 'customer',
-    path: '/customer/tickets/:ticketId',
-    title: 'Ticket',
-    navLabel: 'Ticket',
+    path: '/customer/tickets/:eventId',
+    title: 'Your Tickets',
+    navLabel: 'Your Tickets',
     showInNav: false,
     component: TicketDetailsPage,
   },

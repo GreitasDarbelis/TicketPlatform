@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 @Component("standardPriceStrategy")
 public class StandardTicketPriceStrategy implements TicketPriceStrategy {
 
+    private static final double STANDARD_TICKET_PRICE = 75.0;
+
     @Override
     public double calculatePrice(Event event, User attendee) {
-        // In the future, role-based discounts can be implemented here.
-        // For now, a standard static price is returned for illustration purposes.
-        return 20.00;
+        return STANDARD_TICKET_PRICE;
     }
 }

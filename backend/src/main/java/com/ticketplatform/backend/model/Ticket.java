@@ -2,6 +2,7 @@ package com.ticketplatform.backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -26,6 +27,12 @@ public class Ticket {
 
     @Column(nullable = false)
     private String status; // E.g., "VALID", "USED"
+
+    @Column(nullable = false)
+    private LocalDateTime purchasedAt;
+
+    @Column(nullable = false)
+    private Double pricePaid;
 
     @Version
     private Integer version;

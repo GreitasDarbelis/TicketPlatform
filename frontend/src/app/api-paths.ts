@@ -12,4 +12,8 @@ export const API_PATHS = {
         base: `${API_BASE}/events`,
         byId: (eventId: string) => `${API_BASE}/events/${eventId}`,
     },
+    tickets: {
+        mine: `${API_BASE}/tickets/me`,
+        purchaseByEvent: (eventId: string) => `${API_BASE}/tickets/events/${eventId}`,
+    },
 } as const;
