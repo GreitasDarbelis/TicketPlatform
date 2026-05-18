@@ -67,7 +67,7 @@ export function PurchaseTicketsPage() {
       <Stack spacing={3} sx={{ width: '100%', maxWidth: 980 }}>
         <Button
           component={RouterLink}
-          to={eventId ? `/customer/events/${eventId}` : '/customer/events'}
+          to={eventId ? `/customer/events/${eventId}` : '/customer'}
           startIcon={<ArrowBackRounded />}
           variant="outlined"
           sx={{ alignSelf: 'flex-start', borderRadius: '12px', bgcolor: 'background.paper' }}

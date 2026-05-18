@@ -12,8 +12,8 @@ import {
 import CreditCardRounded from '@mui/icons-material/CreditCardRounded';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEventDetails } from '../events/useEventDetails';
+import { purchaseTickets } from './api';
 import { getAvailableTicketCount } from './mockTicketing';
-import { createMockPurchasedTicket, savePurchasedTicket } from './storage';
 
 function getRequestedQuantity(value: string | null): number {
   const parsedValue = Number(value);
@@ -31,6 +31,7 @@ export function MockPaymentPage() {
   const [searchParams] = useSearchParams();
   const { event, isLoading, errorMessage } = useEventDetails(eventId);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const processingTimeoutRef = useRef<number | null>(null);
 
   const requestedQuantity = getRequestedQuantity(searchParams.get('quantity'));
@@ -46,17 +47,35 @@ export function MockPaymentPage() {
     };
   }, []);
 
+  async function completePurchase() {
+    if (!event || effectiveQuantity < 1) {
+      return;
+    }
+
+    try {
+      await purchaseTickets(event.id, effectiveQuantity);
+      navigate(`/customer/tickets/${event.id}`, {
+        replace: true,
+        state: { justPurchased: true },
+      });
+    } catch (error) {
+      setPurchaseError(
+        error instanceof Error ? error.message : 'Could not complete ticket purchase.',
+      );
+      setIsProcessing(false);
+    }
+  }
+
   function handleProceed() {
     if (!event || isProcessing || effectiveQuantity < 1) {
       return;
     }
 
     setIsProcessing(true);
+    setPurchaseError(null);
 
     processingTimeoutRef.current = window.setTimeout(() => {
-      const purchasedTicket = createMockPurchasedTicket(event, effectiveQuantity);
-      savePurchasedTicket(purchasedTicket);
-      navigate(`/customer/tickets/${purchasedTicket.id}`, { replace: true });
+      void completePurchase();
     }, 1600);
   }
 
@@ -69,6 +88,7 @@ export function MockPaymentPage() {
       ) : null}
 
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+      {purchaseError ? <Alert severity="error">{purchaseError}</Alert> : null}
 
       {!isLoading && !errorMessage && event ? (
         <Card
