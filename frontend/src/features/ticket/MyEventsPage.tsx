@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
+  Alert,
   Box,
-  Button,
   Card,
   CardContent,
+  CircularProgress,
   Chip,
   Stack,
   Typography,
@@ -11,113 +12,159 @@ import {
 import Grid from '@mui/material/Grid';
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
-import ConfirmationNumberOutlined from '@mui/icons-material/ConfirmationNumberOutlined';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
 import { formatEventDate, getEventImage } from '../event/display';
-import { formatTicketPrice } from './mockTicketing';
-import { getPurchasedTickets } from './storage';
-import type { PurchasedTicket } from './ticketTypes.ts';
+import { fetchUserPurchasedEvents } from './ticketApi';
+import type { UserEventDto } from './ticketTypes';
+import { useAuthSession } from '../auth/AuthSessionContext';
 
 type MyEventsPageProps = {
   page: AppPage;
 }
 
-export function MyEventsPage({page}: MyEventsPageProps) {
-  const [tickets, setTickets] = useState<PurchasedTicket[]>(() => getPurchasedTickets());
+export function MyEventsPage({ page }: MyEventsPageProps) {
+  const [events, setEvents] = useState<UserEventDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useAuthSession();
 
   useEffect(() => {
-    setTickets(getPurchasedTickets());
-  }, []);
+    const controller = new AbortController();
+
+    async function loadEvents() {
+      if (!user) {
+        setErrorMessage('You must be logged in to view your tickets.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setErrorMessage(null);
+        const loadedEvents = await fetchUserPurchasedEvents(user.id, controller.signal);
+        setEvents(loadedEvents);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setErrorMessage('Unable to load your events right now.');
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadEvents();
+
+    return () => {
+      controller.abort();
+    };
+  }, [user]);
 
   return (
-    <PageTemplate page={page}>
-      {tickets.length === 0 ? (
-        <Card elevation={0} sx={{ borderRadius: '24px' }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h6">No tickets yet</Typography>
-            <Typography color="text.secondary" sx={{ mt: 1, mb: 3 }}>
-              Tickets you purchase in the mocked checkout flow will appear here.
-            </Typography>
-            <Button component={RouterLink} to="/customer/events" variant="contained" color="secondary">
-              Browse Events
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Grid container spacing={3}>
-          {tickets.map((ticket) => (
-            <Grid key={ticket.id} size={{ xs: 12, md: 6, xl: 4 }}>
-              <Card
-                elevation={0}
-                sx={{
-                  height: '100%',
-                  overflow: 'hidden',
-                  borderRadius: '18px',
-                  boxShadow: '0 8px 24px rgba(6, 30, 35, 0.12)',
-                }}
-              >
-                <Box
-                  sx={{
-                    height: 180,
-                    backgroundImage: `url(${getEventImage(ticket.eventImageData)})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundColor: 'primary.light',
-                  }}
-                />
+      <PageTemplate page={page}>
+        <Stack spacing={3}>
+          {isLoading ? (
+              <Stack sx={{ minHeight: 240, alignItems: 'center', justifyContent: 'center' }}>
+                <CircularProgress />
+              </Stack>
+          ) : null}
 
-                <CardContent sx={{ p: 3 }}>
-                  <Stack spacing={2}>
-                    <Box>
-                      <Typography variant="h5" sx={{ fontSize: '1.35rem', mb: 1 }}>
-                        {ticket.eventTitle}
-                      </Typography>
-                      <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center', mb: 1 }}>
-                        <CalendarMonthOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
-                        <Typography color="text.secondary">
-                          {formatEventDate(ticket.eventDate, 'medium')}
-                        </Typography>
-                      </Stack>
-                      <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
-                        <LocationOnOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
-                        <Typography color="text.secondary">{ticket.eventLocation}</Typography>
-                      </Stack>
-                    </Box>
+          {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
 
-                    <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
-                      <ConfirmationNumberOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
-                      <Typography color="text.secondary">{ticket.ticketCode}</Typography>
-                    </Stack>
-
-                    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
-                      <Chip
-                        label={`${ticket.quantity} ticket${ticket.quantity === 1 ? '' : 's'}`}
-                        sx={{ bgcolor: 'background.default', color: 'primary.dark' }}
-                      />
-                      <Chip
-                        label={formatTicketPrice(ticket.totalPrice)}
-                        sx={{ bgcolor: 'background.default', color: 'primary.dark' }}
-                      />
-                    </Stack>
-
-                    <Button
-                      component={RouterLink}
-                      to={`/customer/tickets/${ticket.id}`}
-                      variant="contained"
-                      color="primary"
-                      sx={{ alignSelf: 'flex-start', borderRadius: '10px' }}
-                    >
-                      View Ticket
-                    </Button>
-                  </Stack>
+          {!isLoading && !errorMessage && events.length === 0 ? (
+              <Card elevation={0} sx={{ borderRadius: '24px' }}>
+                <CardContent sx={{ p: 4 }}>
+                  <Typography variant="h6">No tickets yet</Typography>
+                  <Typography color="text.secondary" sx={{ mt: 1, mb: 3 }}>
+                    Tickets you purchase will appear here.
+                  </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </PageTemplate>
+          ) : null}
+
+          {!isLoading && !errorMessage ? (
+              <Grid container spacing={3}>
+                {events.map((event) => (
+                    <Grid key={event.eventId} size={{ xs: 12, md: 6, xl: 4 }}>
+                      <Card
+                          elevation={0}
+                          onClick={() => navigate(`/customer/tickets/event/${event.eventId}`)}
+                          sx={{
+                            height: '100%',
+                            overflow: 'hidden',
+                            borderRadius: '14px',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.12)',
+                            backgroundColor: 'background.paper',
+                            transition: 'box-shadow 0.3s',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              boxShadow: '0 8px 32px rgba(36, 148, 142, 0.25), 0 4px 14px rgba(0,0,0,0.18)',
+                            },
+                            '&:hover .event-card-image': {
+                              transform: 'scale(1.07)',
+                            },
+                          }}
+                      >
+                        <Box
+                            className="event-card-image"
+                            sx={{
+                              height: 192,
+                              backgroundImage: `url(${getEventImage(event.imageData)})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
+                            }}
+                        />
+
+                        <CardContent sx={{ p: 2.25 }}>
+                          <Stack spacing={1.75}>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                  fontSize: '1.15rem',
+                                  lineHeight: 1.3,
+                                }}
+                            >
+                              {event.title}
+                            </Typography>
+
+                            <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+                              <CalendarMonthOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
+                              <Typography variant="body1" color="text.secondary">
+                                {formatEventDate(event.date, 'medium')}
+                              </Typography>
+                            </Stack>
+
+                            <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+                              <LocationOnOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
+                              <Typography variant="body1" color="text.secondary">
+                                {event.location}
+                              </Typography>
+                            </Stack>
+
+                            <Chip
+                                label={`${event.ticketCount} ticket${event.ticketCount === 1 ? '' : 's'}`}
+                                sx={{
+                                  bgcolor: 'primary.light',
+                                  color: 'primary.dark',
+                                  fontWeight: 600,
+                                }}
+                            />
+
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                ))}
+              </Grid>
+          ) : null}
+        </Stack>
+      </PageTemplate>
   );
 }

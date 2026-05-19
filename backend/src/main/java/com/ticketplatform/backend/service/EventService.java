@@ -1,7 +1,8 @@
 package com.ticketplatform.backend.service;
 
-import com.ticketplatform.backend.dto.CreateEventRequest;
-import com.ticketplatform.backend.dto.PublicEventDto;
+import com.ticketplatform.backend.dto.event.CreateEventRequest;
+import com.ticketplatform.backend.dto.event.PublicEventDto;
+import com.ticketplatform.backend.dto.event.UserEventDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.model.User;
 import com.ticketplatform.backend.repository.EventRepository;
@@ -17,6 +18,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 // REQUIREMENT: Data Access / Transactions
@@ -102,6 +104,25 @@ public class EventService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found."));
 
         return toPublicEventDto(event);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserEventDto> getAttendeePurchasedEvents(UUID attendeeId) {
+        List<Event> events = eventRepository.findEventsByAttendeeId(attendeeId);
+
+        return events.stream()
+                .map(event -> {
+                    int ticketCount = (int) ticketRepository.findByEventIdAndAttendeeId(event.getId(), attendeeId).size();
+                    return new UserEventDto(
+                            event.getId(),
+                            event.getTitle(),
+                            event.getDate(),
+                            event.getLocation(),
+                            event.getImageData(),
+                            ticketCount
+                    );
+                })
+                .toList();
     }
 
     private PublicEventDto toPublicEventDto(Event event) {

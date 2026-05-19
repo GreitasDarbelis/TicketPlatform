@@ -24,3 +24,20 @@ export type PurchaseTicketResponse = {
   eventLocation: string;
   ticketCode: string;
 };
+
+export type UserEventDto = {
+  eventId: string;
+  title: string;
+  date: string;
+  location: string;
+  imageData: string | null;
+  ticketCount: number;
+};
+
+export type UserTicketDto = {
+  ticketId: string;
+  eventTitle: string;
+  eventDate: string;
+  eventLocation: string;
+  ticketCode: string;
+};

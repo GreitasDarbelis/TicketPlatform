@@ -42,7 +42,7 @@ export function MockPaymentPage() {
       });
 
       if (tickets.length > 0) {
-        navigate(`/customer/tickets/${tickets[0].ticketId}`, { replace: true });
+        navigate(`/customer/tickets/event/${eventId}`, { replace: true });
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Couldn't purchase the tickets.";

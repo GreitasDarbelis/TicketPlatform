@@ -5,48 +5,103 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
   Stack,
   Typography,
+  CircularProgress
 } from '@mui/material';
 import CheckRounded from '@mui/icons-material/CheckRounded';
-import { Link as RouterLink, useParams } from 'react-router-dom';
+import {Link as RouterLink, useParams} from 'react-router-dom';
 import { formatEventDate } from '../event/display';
-import { MockQrCode } from './MockQrCode';
-import { formatTicketPrice } from './mockTicketing';
-import { getPurchasedTicketById } from './storage';
-import type { PurchasedTicket } from './ticketTypes.ts';
+import { useAuthSession } from '../auth/AuthSessionContext';
+import type { UserTicketDto } from './ticketTypes';
+import { fetchTicketsByEvent } from './ticketApi';
+import { TicketQRCode } from './TicketQRCode';
 
 export function TicketDetailsPage() {
-  const { ticketId } = useParams<{ ticketId: string }>();
-  const [ticket, setTicket] = useState<PurchasedTicket | null>(() =>
-    ticketId ? getPurchasedTicketById(ticketId) : null,
-  );
+  const { eventId } = useParams<{ eventId: string }>();
+  const { user, status } = useAuthSession();
+  const [tickets, setTickets] = useState<UserTicketDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!ticketId) {
-      setTicket(null);
-      return;
+    useEffect(() => {
+        const controller = new AbortController();
+
+        async function loadTickets() {
+            if (status === 'loading') {
+                return;
+            }
+
+            if (!eventId || !user) {
+                setErrorMessage('Event ID or user information missing.');
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                setErrorMessage(null);
+                const loadedTickets = await fetchTicketsByEvent(eventId, user.id, controller.signal);
+                setTickets(loadedTickets);
+            } catch (error) {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setErrorMessage('Unable to load tickets right now.');
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        void loadTickets();
+
+        return () => {
+            controller.abort();
+        };
+    }, [eventId, user, status]);
+
+    if (isLoading) {
+        return (
+            <Stack sx={{ minHeight: 400, alignItems: 'center', justifyContent: 'center' }}>
+                <CircularProgress />
+            </Stack>
+        );
     }
 
-    setTicket(getPurchasedTicketById(ticketId));
-  }, [ticketId]);
+    if (errorMessage) {
+        return (
+            <Stack spacing={3} sx={{ maxWidth: 720, mx: 'auto' }}>
+                <Alert severity="error">{errorMessage}</Alert>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+                    <Button component={RouterLink} to="/customer/tickets" variant="contained">
+                        View My Events
+                    </Button>
+                    <Button component={RouterLink} to="/customer/events" variant="outlined">
+                        Browse More Events
+                    </Button>
+                </Stack>
+            </Stack>
+        );
+    }
 
-  if (!ticket) {
-    return (
-      <Stack spacing={3} sx={{ maxWidth: 720, mx: 'auto' }}>
-        <Alert severity="warning">This mocked ticket could not be found.</Alert>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-          <Button component={RouterLink} to="/customer/tickets" variant="contained">
-            View My Events
-          </Button>
-          <Button component={RouterLink} to="/customer/events" variant="outlined">
-            Browse More Events
-          </Button>
-        </Stack>
-      </Stack>
-    );
-  }
+    if (tickets.length === 0) {
+        return (
+            <Stack spacing={3} sx={{ maxWidth: 720, mx: 'auto' }}>
+                <Alert severity="warning">No tickets found for this event.</Alert>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+                    <Button component={RouterLink} to="/customer/tickets" variant="contained">
+                        View My Events
+                    </Button>
+                    <Button component={RouterLink} to="/customer/events" variant="outlined">
+                        Browse More Events
+                    </Button>
+                </Stack>
+            </Stack>
+        );
+    }
 
   return (
     <Stack spacing={3} sx={{ maxWidth: 860, mx: 'auto', pb: 4 }}>
@@ -86,45 +141,41 @@ export function TicketDetailsPage() {
         </CardContent>
       </Card>
 
-      <Card
-        elevation={0}
-        sx={{
-          overflow: 'hidden',
-          borderRadius: '24px',
-          boxShadow: '0 18px 38px rgba(6, 30, 35, 0.12)',
-        }}
-      >
-        <Box sx={{ bgcolor: 'primary.main', color: 'common.white', p: { xs: 3, md: 4 } }}>
-          <Typography variant="h4" sx={{ fontSize: { xs: '1.9rem', md: '2.25rem' }, mb: 1.5 }}>
-            {ticket.eventTitle}
-          </Typography>
-          <Typography sx={{ fontSize: '1.05rem', opacity: 0.95 }}>
-            {formatEventDate(ticket.eventDate, 'medium')}
-          </Typography>
-          <Typography sx={{ fontSize: '1.05rem', opacity: 0.95 }}>{ticket.eventLocation}</Typography>
-        </Box>
+      <Stack spacing={2.5}>
+          {tickets.map((ticket) => (
+              <Card
+                  key={ticket.ticketId}
+                  elevation={0}
+                  sx={{
+                      overflow: 'hidden',
+                      borderRadius: '24px',
+                      boxShadow: '0 18px 38px rgba(6, 30, 35, 0.12)',
+                  }}
+              >
+                  <Box sx={{ bgcolor: 'primary.main', color: 'common.white', p: { xs: 3, md: 4 } }}>
+                      <Typography variant="h4" sx={{ fontSize: { xs: '1.9rem', md: '2.25rem' }, mb: 1.5 }}>
+                          {ticket.eventTitle}
+                      </Typography>
+                      <Typography sx={{ fontSize: '1.05rem', opacity: 0.95 }}>
+                          {formatEventDate(ticket.eventDate, 'medium')}
+                      </Typography>
+                      <Typography sx={{ fontSize: '1.05rem', opacity: 0.95 }}>{ticket.eventLocation}</Typography>
+                  </Box>
 
-        <CardContent sx={{ p: { xs: 3, md: 4.5 }, textAlign: 'center' }}>
-          <Stack spacing={2.5} sx={{ alignItems: 'center' }}>
-            <MockQrCode value={`${ticket.id}:${ticket.ticketCode}`} />
+                  <CardContent sx={{ p: { xs: 3, md: 4.5 }, textAlign: 'center' }}>
+                      <Stack spacing={2.5} sx={{ alignItems: 'center' }}>
+                          <TicketQRCode ticketCode={ticket.ticketCode} size={256} />
 
-            <Typography color="text.secondary" sx={{ fontSize: '1.35rem', letterSpacing: '0.04em' }}>
-              {ticket.ticketCode}
-            </Typography>
+                          <Typography color="text.secondary" sx={{ fontSize: '1.35rem', letterSpacing: '0.04em' }}>
+                              {ticket.ticketCode}
+                          </Typography>
+                      </Stack>
+                  </CardContent>
+              </Card>
+          ))}
+      </Stack>
 
-            <Stack direction="row" spacing={1.25} useFlexGap sx={{ justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Chip
-                label={`${ticket.quantity} ticket${ticket.quantity === 1 ? '' : 's'}`}
-                sx={{ bgcolor: 'background.default', color: 'primary.dark' }}
-              />
-              <Chip
-                label={`Paid ${formatTicketPrice(ticket.totalPrice)}`}
-                sx={{ bgcolor: 'background.default', color: 'primary.dark' }}
-              />
-            </Stack>
-          </Stack>
-        </CardContent>
-      </Card>
+
 
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
         <Button

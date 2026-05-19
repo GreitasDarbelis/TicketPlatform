@@ -2,6 +2,7 @@ package com.ticketplatform.backend.service;
 
 import com.ticketplatform.backend.dto.ticket.PurchaseTicketRequest;
 import com.ticketplatform.backend.dto.ticket.PurchaseTicketResponse;
+import com.ticketplatform.backend.dto.ticket.UserTicketDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.model.Ticket;
 import com.ticketplatform.backend.model.User;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TicketService {
@@ -27,6 +29,25 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserTicketDto> getTicketsByEventIdAndAttendeeId(UUID eventId, UUID attendeeId) {
+        List<Ticket> tickets = ticketRepository.findByEventIdAndAttendeeId(eventId, attendeeId);
+
+        if (tickets.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tickets found for this event.");
+        }
+
+        return tickets.stream()
+                .map(ticket -> new UserTicketDto(
+                        ticket.getId(),
+                        ticket.getEvent().getTitle(),
+                        ticket.getEvent().getDate(),
+                        ticket.getEvent().getLocation(),
+                        ticket.getTicketCode()
+                ))
+                .toList();
     }
 
     @Transactional
