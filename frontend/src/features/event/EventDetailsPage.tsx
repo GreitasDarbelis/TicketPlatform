@@ -16,7 +16,7 @@ import AttachMoneyRounded from '@mui/icons-material/AttachMoneyRounded';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { formatEventDate, getEventImage } from './display';
 import { useEventDetails } from './useEventDetails';
-import { formatTicketPrice, MOCK_TICKET_PRICE } from '../tickets/mockTicketing';
+import { formatTicketPrice, MOCK_TICKET_PRICE } from '../ticket/mockTicketing';
 
 type DetailRowProps = {
   icon: React.ReactNode;

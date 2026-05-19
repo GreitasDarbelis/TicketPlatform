@@ -1,4 +1,4 @@
-import type { CreateEventRequest, EventSummary } from './types'; // matches the response from GET /api/events and GET /api/events/{id}
+import type { CreateEventRequest, EventSummary } from './eventTypes.ts'; // matches the response from GET /api/events and GET /api/events/{id}
 import { API_PATHS } from "../../app/api-paths";
 
 async function readJsonResponse<T>(response: Response): Promise<T> {

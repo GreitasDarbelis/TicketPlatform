@@ -4,7 +4,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import App from './App';
 import { appTheme } from './app/theme';
 import './style.css';
-import {AuthSessionProvider} from "./features/session/AuthSessionContext";
+import {AuthSessionProvider} from "./features/auth/AuthSessionContext";
 
 const appRoot = document.querySelector<HTMLDivElement>('#app');
 

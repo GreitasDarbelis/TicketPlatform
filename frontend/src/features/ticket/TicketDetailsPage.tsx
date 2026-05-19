@@ -11,11 +11,11 @@ import {
 } from '@mui/material';
 import CheckRounded from '@mui/icons-material/CheckRounded';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { formatEventDate } from '../events/display';
+import { formatEventDate } from '../event/display';
 import { MockQrCode } from './MockQrCode';
 import { formatTicketPrice } from './mockTicketing';
 import { getPurchasedTicketById } from './storage';
-import type { PurchasedTicket } from './types';
+import type { PurchasedTicket } from './ticketTypes.ts';
 
 export function TicketDetailsPage() {
   const { ticketId } = useParams<{ ticketId: string }>();

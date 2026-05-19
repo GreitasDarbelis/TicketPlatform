@@ -14,8 +14,8 @@ import Grid from '@mui/material/Grid';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { PageTemplate } from '../../components/PageTemplate';
 import type { AppPage } from '../../app/page-registry';
-import { fetchEventById, updateEvent } from './api';
-import type { CreateEventRequest } from './types';
+import { fetchEventById, updateEvent } from './eventApi.ts';
+import type { CreateEventRequest } from './eventTypes.ts';
 
 type EditEventPageProps = {
   page: AppPage;

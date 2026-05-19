@@ -7,45 +7,28 @@ import {
   CircularProgress,
   Stack,
   Typography,
-  Button,
 } from '@mui/material';
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
 import Grid from '@mui/material/Grid';
+import { useNavigate } from 'react-router-dom';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
-import { fetchEvents } from './api';
-import type { EventSummary } from './types';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { fetchEvents } from './eventApi.ts';
+import { formatEventDate, getEventImage } from './display';
+import type { EventSummary } from './eventTypes.ts';
 
-type OrganizerEventsPageProps = {
+type EventListPageProps = {
   page: AppPage;
 }
 
-function formatEventDate(value: string): string { // formats into "20 Mar 2024, 7:30 PM"
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
-}
-
-function getEventImage(imageData: string | null): string {
-  return imageData ?? '';
-}
-
-export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
-  const [events, setEvents] = useState<EventSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function EventListPage({page}: EventListPageProps) {
+  const [events, setEvents] = useState<EventSummary[]>([]); // list of events
+  const [isLoading, setIsLoading] = useState(true); // loading state for fetching events
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const actions = (
-    <Button component={RouterLink} to="/organizer/events/new" variant="contained" color="secondary" disableElevation>
-      Create Event
-    </Button>
-  );
-
-  useEffect(() => {
+  useEffect(() => { // load events on page load
     const controller = new AbortController();
 
     async function loadEvents() {
@@ -55,46 +38,46 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
         const loadedEvents = await fetchEvents(controller.signal);
         setEvents(loadedEvents);
       } catch (error) {
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted) {
+          return;
+        }
+
         setErrorMessage('Unable to load events right now.');
       } finally {
-        if (!controller.signal.aborted) setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }
 
     void loadEvents();
-    return () => controller.abort();
-  }, []);
 
+    return () => {
+      controller.abort();
+    };
+  }, []);
+  // the main content of the page - shows loading state, error message, empty state or list of events
   return (
-    <PageTemplate page={page} actions={actions}>
+    <PageTemplate page={page}>
       <Stack spacing={3}>
         {isLoading ? (
           <Stack sx={{ minHeight: 240, alignItems: 'center', justifyContent: 'center' }}>
             <CircularProgress />
           </Stack>
-        ) : null}
+        ) : null} {/* loading state */}
 
-        {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+        {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null} {/* error state */}
 
         {!isLoading && !errorMessage && events.length === 0 ? (
           <Card elevation={0} sx={{ borderRadius: '24px' }}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6">No events yet</Typography>
               <Typography color="text.secondary" sx={{ mt: 1 }}>
-                You haven't published any events yet.
+                Organizers have not published any events yet.
               </Typography>
-              <Button
-                variant="contained"
-                sx={{ mt: 2 }}
-                component={RouterLink}
-                to="/organizer/events/new"
-              >
-                Create Event
-              </Button>
             </CardContent>
           </Card>
-        ) : null}
+        ) : null} {/* empty state */}
 
         {!isLoading && !errorMessage ? (
           <Grid container spacing={3}>
@@ -102,7 +85,7 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
               <Grid key={event.id} size={{ xs: 12, md: 6, xl: 4 }}>
                 <Card
                   elevation={0}
-                  onClick={() => navigate(`/organizer/events/edit/${event.id}`)}
+                  onClick={() => navigate(`/customer/events/${event.id}`)}
                   sx={{
                     height: '100%',
                     overflow: 'hidden',
@@ -138,13 +121,13 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
                           lineHeight: 1.3,
                         }}
                       >
-                        {event.title}
+                          {event.title}
                       </Typography>
 
                       <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
                         <CalendarMonthOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
                         <Typography variant="body1" color="text.secondary">
-                          {formatEventDate(event.date)}
+                          {formatEventDate(event.date, 'medium')}
                         </Typography>
                       </Stack>
 
@@ -160,9 +143,8 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
               </Grid>
             ))}
           </Grid>
-        ) : null}
+        ) : null} {/* list of events */}
       </Stack>
     </PageTemplate>
   );
 }
-

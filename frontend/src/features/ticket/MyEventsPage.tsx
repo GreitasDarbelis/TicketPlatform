@@ -15,10 +15,10 @@ import ConfirmationNumberOutlined from '@mui/icons-material/ConfirmationNumberOu
 import { Link as RouterLink } from 'react-router-dom';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
-import { formatEventDate, getEventImage } from '../events/display';
+import { formatEventDate, getEventImage } from '../event/display';
 import { formatTicketPrice } from './mockTicketing';
 import { getPurchasedTickets } from './storage';
-import type { PurchasedTicket } from './types';
+import type { PurchasedTicket } from './ticketTypes.ts';
 
 type MyEventsPageProps = {
   page: AppPage;

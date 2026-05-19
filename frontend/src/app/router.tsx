@@ -8,9 +8,9 @@ import {
 } from './page-registry';
 import { roleHomePaths, roles, type UserRole } from './roles';
 import { PagePlaceholder } from '../components/PagePlaceholder';
-import { useAuthSession } from '../features/session/AuthSessionContext';
-import { AuthGuard } from '../features/session/AuthGuard';
-import AuthPage from '../features/session/AuthPage';
+import { useAuthSession } from '../features/auth/AuthSessionContext';
+import { AuthGuard } from '../features/auth/AuthGuard';
+import AuthPage from '../features/auth/AuthPage';
 import { Box, CircularProgress } from '@mui/material';
 
 function AuthRedirect() {

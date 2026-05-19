@@ -14,7 +14,7 @@ import AddRounded from '@mui/icons-material/AddRounded';
 import ArrowBackRounded from '@mui/icons-material/ArrowBackRounded';
 import RemoveRounded from '@mui/icons-material/RemoveRounded';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
-import { useEventDetails } from '../events/useEventDetails';
+import { useEventDetails } from '../event/useEventDetails';
 import {
   formatTicketPrice,
   getAvailableTicketCount,

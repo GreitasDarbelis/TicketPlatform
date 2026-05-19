@@ -1,28 +1,6 @@
-import type {UserRole} from "../../app/roles";
 import { API_PATHS } from "../../app/api-paths";
+import type {AuthUser, AuthResponse, SignupRequestDto, LoginRequestDto} from "./authTypes.ts";
 
-export type AuthUser = {
-    id: string;
-    username: string;
-    email: string;
-    role: UserRole;
-};
-
-type AuthResponse = {
-    user: AuthUser;
-};
-
-type LoginRequestDto = {
-    email: string;
-    password: string;
-}
-
-type SignupRequestDto = {
-    username: string;
-    email: string;
-    password: string;
-    role: UserRole;
-}
 
 async function readJsonResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {

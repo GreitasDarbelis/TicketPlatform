@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { fetchEventById } from './api';
-import type { EventSummary } from './types';
+import { fetchEventById } from './eventApi.ts';
+import type { EventSummary } from './eventTypes.ts';
 
 type UseEventDetailsResult = {
   event: EventSummary | null;
