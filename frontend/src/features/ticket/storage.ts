@@ -1,6 +1,6 @@
-import type { EventSummary } from '../events/types';
+import type { EventSummary } from '../event/eventTypes.ts';
 import { MOCK_TICKET_PRICE } from './mockTicketing';
-import type { PurchasedTicket } from './types';
+import type { PurchasedTicket } from './ticketTypes.ts';
 
 const STORAGE_KEY = 'ticket-platform.mock-purchased-tickets';
 

@@ -1,8 +1,8 @@
 package com.ticketplatform.backend.controller;
 
-import com.ticketplatform.backend.dto.CreateEventRequest;
-import com.ticketplatform.backend.dto.PublicEventDto;
-import com.ticketplatform.backend.model.Event;
+import com.ticketplatform.backend.dto.event.CreateEventRequest;
+import com.ticketplatform.backend.dto.event.PublicEventDto;
+import com.ticketplatform.backend.dto.event.UserEventDto;
 import com.ticketplatform.backend.service.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +31,18 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<PublicEventDto> getEvent(@PathVariable UUID id) {
         return ResponseEntity.ok(eventService.getPublicEvent(id));
+    }
+
+    @GetMapping("/attendee-events")
+    public ResponseEntity<List<UserEventDto>> getAttendeePurchasedEvents(@RequestParam UUID attendeeId) {
+        List<UserEventDto> events = eventService.getAttendeePurchasedEvents(attendeeId);
+        return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/organizer-events/{organizerId}")
+    public ResponseEntity<List<PublicEventDto>> getOrganizerEvents(@PathVariable UUID organizerId) {
+        List<PublicEventDto> events = eventService.getOrganizerEvents(organizerId);
+        return ResponseEntity.ok(events);
     }
 
     @PostMapping

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthSession } from "./AuthSessionContext";
 import { type UserRole, roleHomePaths} from "../../app/roles";
 import {CONFIRMATION_CODE} from "../../constants";
@@ -23,14 +23,6 @@ type TabPanelProps = {
     value: number;
 }
 
-type AuthLocationState = {
-    from?: { pathname?: string };
-};
-
-function isAuthRoute(pathname: string): boolean {
-    return pathname === '/login' || pathname === '/signup';
-}
-
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
     return (
@@ -49,7 +41,6 @@ function TabPanel(props: TabPanelProps) {
 export default function AuthPage() {
     const theme = useTheme();
     const navigate = useNavigate();
-    const location = useLocation();
     const { login, signup } = useAuthSession();
 
     const [tabValue, setTabValue] = useState(0);
@@ -85,17 +76,10 @@ export default function AuthPage() {
     };
 
     const redirectAfterAuth = (role: UserRole) => {
-        const state = location.state as AuthLocationState | null;
-        const fromPath = state?.from?.pathname;
         const roleHomePath = roleHomePaths[role];
-
-        const targetPath =
-            fromPath && !isAuthRoute(fromPath)
-                ? fromPath
-                : roleHomePath;
-
-        navigate(targetPath, { replace: true });
+        navigate(roleHomePath, { replace: true });
     };
+
 
     const handleLoginSubmit = async () => {
         setLoginError(null);

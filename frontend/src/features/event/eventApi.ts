@@ -1,4 +1,4 @@
-import type { CreateEventRequest, EventSummary } from './types'; // matches the response from GET /api/events and GET /api/events/{id}
+import type { CreateEventRequest, EventSummary } from './eventTypes.ts'; // matches the response from GET /api/events and GET /api/events/{id}
 import { API_PATHS } from "../../app/api-paths";
 
 async function readJsonResponse<T>(response: Response): Promise<T> {
@@ -26,6 +26,18 @@ async function readJsonResponse<T>(response: Response): Promise<T> {
 
 export async function fetchEvents(signal?: AbortSignal): Promise<EventSummary[]> {
   const response = await fetch(API_PATHS.events.base, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+    signal,
+  });
+
+  return readJsonResponse<EventSummary[]>(response);
+}
+
+export async function fetchEventsByOrganizerId(organizerId: string, signal?: AbortSignal): Promise<EventSummary[]> {
+  const response = await fetch(API_PATHS.events.byOrganizerId(organizerId), {
     method: 'GET',
     headers: {
       Accept: 'application/json',

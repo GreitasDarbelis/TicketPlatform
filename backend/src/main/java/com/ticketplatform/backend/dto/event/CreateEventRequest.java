@@ -1,4 +1,4 @@
-package com.ticketplatform.backend.dto;
+package com.ticketplatform.backend.dto.event;
 
 public record CreateEventRequest(
         String title,

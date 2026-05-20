@@ -1,10 +1,12 @@
 package com.ticketplatform.backend.service;
 
-import com.ticketplatform.backend.dto.CreateEventRequest;
-import com.ticketplatform.backend.dto.PublicEventDto;
+import com.ticketplatform.backend.dto.event.CreateEventRequest;
+import com.ticketplatform.backend.dto.event.PublicEventDto;
+import com.ticketplatform.backend.dto.event.UserEventDto;
 import com.ticketplatform.backend.model.Event;
 import com.ticketplatform.backend.model.User;
 import com.ticketplatform.backend.repository.EventRepository;
+import com.ticketplatform.backend.repository.TicketRepository;
 import com.ticketplatform.backend.repository.UserRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 // REQUIREMENT: Data Access / Transactions
@@ -31,10 +34,12 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, TicketRepository ticketRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @Transactional
@@ -48,6 +53,7 @@ public class EventService {
         event.setLocation(request.location().trim());
         event.setImageData(blankToNull(request.imageUrl()));
         event.setTotalTickets(request.totalTickets());
+        event.setAvailableTickets(request.totalTickets());
         event.setOrganizer(resolveOrganizer(request.organizerEmail()));
 
         Event savedEvent = eventRepository.save(event);
@@ -67,7 +73,17 @@ public class EventService {
         existing.setDate(parseDateTime(request.date(), request.time()));
         existing.setLocation(request.location().trim());
         existing.setImageData(blankToNull(request.imageUrl()));
+
+        int soldTickets = (int) ticketRepository.findByEventId(id).size();
+        if (request.totalTickets() != null && request.totalTickets() < soldTickets) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot reduce total tickets below already sold tickets. Sold: " + soldTickets + ", Requested total: " + request.totalTickets()
+            );
+        }
+
         existing.setTotalTickets(request.totalTickets());
+        existing.setAvailableTickets(request.totalTickets() - soldTickets);
         existing.setOrganizer(resolveOrganizer(request.organizerEmail()));
 
         Event saved = eventRepository.save(existing);
@@ -76,7 +92,15 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public java.util.List<PublicEventDto> getPublicEvents() {
-        return eventRepository.findAll(Sort.by(Sort.Direction.ASC, "date"))
+        return eventRepository.findUpcomingEvents()
+                .stream()
+                .map(this::toPublicEventDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PublicEventDto> getOrganizerEvents(UUID organizerId) {
+        return eventRepository.findEventsByOrganizerId(organizerId)
                 .stream()
                 .map(this::toPublicEventDto)
                 .toList();
@@ -88,6 +112,25 @@ public class EventService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found."));
 
         return toPublicEventDto(event);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserEventDto> getAttendeePurchasedEvents(UUID attendeeId) {
+        List<Event> events = eventRepository.findEventsByAttendeeId(attendeeId);
+
+        return events.stream()
+                .map(event -> {
+                    int ticketCount = (int) ticketRepository.findByEventIdAndAttendeeId(event.getId(), attendeeId).size();
+                    return new UserEventDto(
+                            event.getId(),
+                            event.getTitle(),
+                            event.getDate(),
+                            event.getLocation(),
+                            event.getImageData(),
+                            ticketCount
+                    );
+                })
+                .toList();
     }
 
     private PublicEventDto toPublicEventDto(Event event) {

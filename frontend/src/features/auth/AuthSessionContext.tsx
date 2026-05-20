@@ -1,12 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { UserRole } from '../../app/roles';
-import {
-    fetchCurrentUser,
-    loginRequest,
-    logoutRequest,
-    signupRequest,
-    type AuthUser,
-} from './authApi';
+import { fetchCurrentUser, loginRequest, logoutRequest, signupRequest } from './authApi.ts';
+import type {AuthUser} from "./authTypes";
 
 type AuthSessionContextValue = {
     status: 'anonymous' | 'authenticated' | 'loading';

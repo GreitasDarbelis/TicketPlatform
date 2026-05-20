@@ -4,7 +4,7 @@ import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { getActiveNavPage, getNavPagesForRole } from './page-registry';
 import { roleLabels, type UserRole } from './roles';
-import { useAuthSession } from '../features/session/AuthSessionContext';
+import { useAuthSession } from '../features/auth/AuthSessionContext';
 
 function AppShell() {
   const location = useLocation();

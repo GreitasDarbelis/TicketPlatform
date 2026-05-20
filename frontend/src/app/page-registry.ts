@@ -1,13 +1,13 @@
 import { type ComponentType } from 'react';
-import { EventListPage } from '../features/events/EventListPage';
-import { EventDetailsPage } from '../features/events/EventDetailsPage';
-import CreateEventPage from '../features/events/CreateEventPage';
-import EditEventPage from '../features/events/EditEventPage';
-import { OrganizerEventsPage } from '../features/events/OrganizerEventsPage';
-import { MockPaymentPage } from '../features/tickets/MockPaymentPage';
-import { MyEventsPage } from '../features/tickets/MyEventsPage';
-import { PurchaseTicketsPage } from '../features/tickets/PurchaseTicketsPage';
-import { TicketDetailsPage } from '../features/tickets/TicketDetailsPage';
+import { EventListPage } from '../features/event/EventListPage';
+import { EventDetailsPage } from '../features/event/EventDetailsPage';
+import CreateEventPage from '../features/event/CreateEventPage';
+import EditEventPage from '../features/event/EditEventPage';
+import { OrganizerEventsPage } from '../features/event/OrganizerEventsPage';
+import { MockPaymentPage } from '../features/ticket/MockPaymentPage';
+import { MyEventsPage } from '../features/ticket/MyEventsPage';
+import { PurchaseTicketsPage } from '../features/ticket/PurchaseTicketsPage';
+import { TicketDetailsPage } from '../features/ticket/TicketDetailsPage';
 import { roleHomePaths, type UserRole } from './roles';
 
 export type AppPage = {
@@ -60,14 +60,14 @@ export const appPages: AppPage[] = [
     id: 'customer-tickets',
     role: 'customer',
     path: '/customer/tickets',
-    title: 'My Events',
-    navLabel: 'My Events',
+    title: 'My Tickets',
+    navLabel: 'My Tickets',
     component: MyEventsPage,
   },
   {
     id: 'customer-ticket-details',
     role: 'customer',
-    path: '/customer/tickets/:ticketId',
+    path: '/customer/tickets/event/:eventId',
     title: 'Ticket',
     navLabel: 'Ticket',
     showInNav: false,

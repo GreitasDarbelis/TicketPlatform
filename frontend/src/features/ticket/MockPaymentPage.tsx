@@ -1,19 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { useState } from 'react';
+import { Alert, Box, Button, Card, CardContent, CircularProgress, Stack, Typography } from '@mui/material';
 import CreditCardRounded from '@mui/icons-material/CreditCardRounded';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useEventDetails } from '../events/useEventDetails';
-import { getAvailableTicketCount } from './mockTicketing';
-import { createMockPurchasedTicket, savePurchasedTicket } from './storage';
+import { useEventDetails } from '../event/useEventDetails';
+import { purchaseTickets } from "./ticketApi";
+import { useAuthSession} from "../auth/AuthSessionContext";
 
 function getRequestedQuantity(value: string | null): number {
   const parsedValue = Number(value);
@@ -30,34 +21,35 @@ export function MockPaymentPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { event, isLoading, errorMessage } = useEventDetails(eventId);
+  const { user } = useAuthSession();
   const [isProcessing, setIsProcessing] = useState(false);
-  const processingTimeoutRef = useRef<number | null>(null);
+  const [error, setError] = useState<string | null>(errorMessage);
 
   const requestedQuantity = getRequestedQuantity(searchParams.get('quantity'));
-  const effectiveQuantity = event
-    ? Math.min(requestedQuantity, getAvailableTicketCount(event.totalTickets))
-    : requestedQuantity;
 
-  useEffect(() => {
-    return () => {
-      if (processingTimeoutRef.current !== null) {
-        window.clearTimeout(processingTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  function handleProceed() {
-    if (!event || isProcessing || effectiveQuantity < 1) {
+  async function handleProceed() {
+    if (!event || !user || isProcessing || requestedQuantity < 1) {
       return;
     }
 
     setIsProcessing(true);
 
-    processingTimeoutRef.current = window.setTimeout(() => {
-      const purchasedTicket = createMockPurchasedTicket(event, effectiveQuantity);
-      savePurchasedTicket(purchasedTicket);
-      navigate(`/customer/tickets/${purchasedTicket.id}`, { replace: true });
-    }, 1600);
+    try {
+      const tickets = await purchaseTickets({
+        eventId: event.id,
+        attendeeId: user.id,
+        ticketQuantity: requestedQuantity,
+      });
+
+      if (tickets.length > 0) {
+        navigate(`/customer/tickets/event/${eventId}`, { replace: true });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Couldn't purchase the tickets.";
+      setError(message);
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   return (
@@ -68,9 +60,9 @@ export function MockPaymentPage() {
         </Stack>
       ) : null}
 
-      {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+      {error ? <Alert severity="error">{error}</Alert> : null}
 
-      {!isLoading && !errorMessage && event ? (
+      {!isLoading && !error && event ? (
         <Card
           elevation={0}
           sx={{
@@ -123,7 +115,7 @@ export function MockPaymentPage() {
                   variant="contained"
                   color="secondary"
                   size="large"
-                  disabled={effectiveQuantity < 1}
+                  disabled={requestedQuantity < 1}
                   sx={{ borderRadius: '10px', px: 5.5, py: 1.2, fontSize: '1.15rem' }}
                 >
                   Proceed
