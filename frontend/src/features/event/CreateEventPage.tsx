@@ -13,6 +13,7 @@ import Grid from '@mui/material/Grid';
 import { PageTemplate } from '../../components/PageTemplate';
 import type { AppPage } from '../../app/page-registry';
 import { createEvent } from './eventApi.ts';
+import {useAuthSession} from "../auth/AuthSessionContext";
 
 type CreateEventPageProps = {
   page: AppPage;
@@ -30,11 +31,18 @@ export default function CreateEventPage({page}: CreateEventPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const {user} = useAuthSession();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError(null);
     setSubmitSuccess(null);
+
+    if (!user) {
+      setSubmitError("User information is missing.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -47,7 +55,7 @@ export default function CreateEventPage({page}: CreateEventPageProps) {
         description: description.trim() || null,
         totalTickets: tickets === '' ? null : tickets,
         imageUrl: imageUrl.trim() || null,
-        organizerEmail: null,
+        organizerEmail: user.email,
       });
 
       setSubmitSuccess('Event created successfully.');
