@@ -18,20 +18,10 @@ import {fetchEventsByOrganizerId} from './eventApi.ts';
 import type { EventSummary } from './eventTypes.ts';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {useAuthSession} from "../auth/AuthSessionContext";
+import { formatEventDate, getEventImage } from './display';
 
 type OrganizerEventsPageProps = {
   page: AppPage;
-}
-
-function formatEventDate(value: string): string { // formats into "20 Mar 2024, 7:30 PM"
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
-}
-
-function getEventImage(imageData: string | null): string {
-  return imageData ?? '';
 }
 
 export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
@@ -152,7 +142,7 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
                       <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
                         <CalendarMonthOutlined sx={{ fontSize: 18, color: 'primary.dark' }} />
                         <Typography variant="body1" color="text.secondary">
-                          {formatEventDate(event.date)}
+                          {formatEventDate(event.date, 'medium')}
                         </Typography>
                       </Stack>
 

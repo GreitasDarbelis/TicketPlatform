@@ -12,7 +12,7 @@ import {
 import Grid from '@mui/material/Grid';
 import { PageTemplate } from '../../components/PageTemplate';
 import type { AppPage } from '../../app/page-registry';
-import { createEvent } from './eventApi.ts';
+import { createEvent } from './eventApi';
 import {useAuthSession} from "../auth/AuthSessionContext";
 
 type CreateEventPageProps = {

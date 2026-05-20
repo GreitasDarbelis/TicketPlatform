@@ -14,8 +14,9 @@ import Grid from '@mui/material/Grid';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { PageTemplate } from '../../components/PageTemplate';
 import type { AppPage } from '../../app/page-registry';
-import { fetchEventById, updateEvent } from './eventApi.ts';
-import type { CreateEventRequest } from './eventTypes.ts';
+import { fetchEventById, updateEvent } from './eventApi';
+import type { CreateEventRequest } from './eventTypes';
+import {useAuthSession} from "../auth/AuthSessionContext";
 
 type EditEventPageProps = {
   page: AppPage;
@@ -41,10 +42,10 @@ export default function EditEventPage({page}: EditEventPageProps) {
   const [price, setPrice] = useState<number | ''>('');
   const [tickets, setTickets] = useState<number | ''>('');
   const [imageUrl, setImageUrl] = useState('');
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const {user} = useAuthSession();
 
   useEffect(() => {
     if (!id) {
@@ -94,8 +95,9 @@ export default function EditEventPage({page}: EditEventPageProps) {
     setSubmitError(null);
     setSubmitSuccess(null);
 
-    if (!id) {
-      setSubmitError('Missing event id.');
+    if (!id || !user) {
+      setSubmitError('Event id or user information is missing.');
+      setIsSubmitting(false);
       return;
     }
 
@@ -107,7 +109,7 @@ export default function EditEventPage({page}: EditEventPageProps) {
       description: description.trim() || null,
       totalTickets: tickets === '' ? null : tickets,
       imageUrl: imageUrl.trim() || null,
-      organizerEmail: null,
+      organizerEmail: user.email,
     };
 
     // Client-side validation mirroring server rules to avoid 400 errors
