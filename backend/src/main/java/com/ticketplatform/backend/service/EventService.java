@@ -92,7 +92,15 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public java.util.List<PublicEventDto> getPublicEvents() {
-        return eventRepository.findAll(Sort.by(Sort.Direction.ASC, "date"))
+        return eventRepository.findUpcomingEvents()
+                .stream()
+                .map(this::toPublicEventDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PublicEventDto> getOrganizerEvents(UUID organizerId) {
+        return eventRepository.findEventsByOrganizerId(organizerId)
                 .stream()
                 .map(this::toPublicEventDto)
                 .toList();

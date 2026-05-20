@@ -36,6 +36,18 @@ export async function fetchEvents(signal?: AbortSignal): Promise<EventSummary[]>
   return readJsonResponse<EventSummary[]>(response);
 }
 
+export async function fetchEventsByOrganizerId(organizerId: string, signal?: AbortSignal): Promise<EventSummary[]> {
+  const response = await fetch(API_PATHS.events.byOrganizerId(organizerId), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+    signal,
+  });
+
+  return readJsonResponse<EventSummary[]>(response);
+}
+
 export async function fetchEventById(eventId: string, signal?: AbortSignal): Promise<EventSummary> {
   const response = await fetch(API_PATHS.events.byId(eventId), {
     method: 'GET',

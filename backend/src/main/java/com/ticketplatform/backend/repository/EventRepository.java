@@ -15,6 +15,12 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
+    @Query("SELECT e FROM Event e WHERE e.date > CURRENT_TIMESTAMP ORDER BY e.date ASC")
+    List<Event> findUpcomingEvents();
+
     @Query("SELECT DISTINCT t.event FROM Ticket t WHERE t.attendee.id = :attendeeId ORDER BY t.event.date ASC")
     List<Event> findEventsByAttendeeId(@Param("attendeeId") UUID attendeeId);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.id = :organizerId ORDER BY e.date DESC")
+    List<Event> findEventsByOrganizerId(@Param("organizerId") UUID organizerId);
 }

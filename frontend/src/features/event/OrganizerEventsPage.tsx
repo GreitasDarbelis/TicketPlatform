@@ -14,9 +14,10 @@ import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
 import Grid from '@mui/material/Grid';
 import type { AppPage } from '../../app/page-registry';
 import { PageTemplate } from '../../components/PageTemplate';
-import { fetchEvents } from './eventApi.ts';
+import {fetchEventsByOrganizerId} from './eventApi.ts';
 import type { EventSummary } from './eventTypes.ts';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import {useAuthSession} from "../auth/AuthSessionContext";
 
 type OrganizerEventsPageProps = {
   page: AppPage;
@@ -38,6 +39,7 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuthSession();
 
   const actions = (
     <Button component={RouterLink} to="/organizer/events/new" variant="contained" color="secondary" disableElevation>
@@ -49,10 +51,16 @@ export function OrganizerEventsPage({page}: OrganizerEventsPageProps) {
     const controller = new AbortController();
 
     async function loadEvents() {
+      if (!user) {
+        setErrorMessage("User information is missing.");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
         setErrorMessage(null);
-        const loadedEvents = await fetchEvents(controller.signal);
+        const loadedEvents = await fetchEventsByOrganizerId(user.id, controller.signal);
         setEvents(loadedEvents);
       } catch (error) {
         if (controller.signal.aborted) return;

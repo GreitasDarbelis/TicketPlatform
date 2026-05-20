@@ -39,6 +39,12 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping("/organizer-events/{organizerId}")
+    public ResponseEntity<List<PublicEventDto>> getOrganizerEvents(@PathVariable UUID organizerId) {
+        List<PublicEventDto> events = eventService.getOrganizerEvents(organizerId);
+        return ResponseEntity.ok(events);
+    }
+
     @PostMapping
     public ResponseEntity<PublicEventDto> createEvent(@RequestBody CreateEventRequest request) {
         PublicEventDto created = eventService.createEvent(request);
